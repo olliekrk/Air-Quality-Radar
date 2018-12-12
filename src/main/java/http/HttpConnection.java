@@ -18,11 +18,6 @@ public class HttpConnection implements Closeable {
         }
     }
 
-    @Override
-    public void close() {
-        connection.disconnect();
-    }
-
     public InputStream getResponseAsInputStream() {
         responseCheck();
         try {
@@ -30,6 +25,23 @@ public class HttpConnection implements Closeable {
         } catch (IOException e) {
             throw new AppException(e);
         }
+    }
+
+    void responseCheck() throws AppException {
+        try {
+            int response = connection.getResponseCode();
+            if (response != 200) {
+                String msg = connection.getResponseMessage();
+                throw new AppException(response + ": There was a problem with HTTP connection: " + msg);
+            }
+        } catch (IOException e) {
+            throw new AppException(e);
+        }
+    }
+
+    @Override
+    public void close() {
+        connection.disconnect();
     }
 
     public String response() {
@@ -44,17 +56,5 @@ public class HttpConnection implements Closeable {
             throw new AppException(e);
         }
         return responseData.toString();
-    }
-
-    void responseCheck() throws AppException {
-        try {
-            int response = connection.getResponseCode();
-            if (response != 200) {
-                String msg = connection.getResponseMessage();
-                throw new AppException(response + ": There was a problem with HTTP connection: " + msg);
-            }
-        } catch (IOException e) {
-            throw new AppException(e);
-        }
     }
 }
