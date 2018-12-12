@@ -1,7 +1,8 @@
-import java.io.BufferedReader;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStreamReader;
+package http;
+
+import exceptions.AppException;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -20,6 +21,15 @@ public class HttpConnection implements Closeable {
     @Override
     public void close() {
         connection.disconnect();
+    }
+
+    public InputStream getResponseAsInputStream() {
+        responseCheck();
+        try {
+            return this.connection.getInputStream();
+        } catch (IOException e) {
+            throw new AppException(e);
+        }
     }
 
     public String response() {

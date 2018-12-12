@@ -1,3 +1,5 @@
+package data;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,3 +34,6 @@ public class MeasurmentValue {
     }
 
 }
+
+//na 18
+//pierwsze cztery punkty zaimplementować
