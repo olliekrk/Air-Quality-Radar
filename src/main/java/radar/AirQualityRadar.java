@@ -4,6 +4,7 @@ import data.Station;
 import http.HttpExtractor;
 import qualityIndex.AirQualityIndex;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 public abstract class AirQualityRadar {
@@ -15,10 +16,22 @@ public abstract class AirQualityRadar {
 
     //1. indeks jakości powietrza dla podanej nazwy stacji pommiarowej
     public void getAirQualityIndexForStation(String stationName) {
-        Station station = adapter.findStationByName(stationName);
-        InputStream input = extractor.extractIndexData(station.getId());
-        AirQualityIndex index = translator.readIndexData(input);
-        printer.printIndexData(index);
+        Station station;
+        try {
+            station = adapter.findStationByName(stationName);
+        } catch (IOException e) {
+            System.out.println("Station with name: " + stationName + " could not be found.");
+            return;
+        }
+        String data = extractor.extractIndexData(station.getId());
+        AirQualityIndex index;
+        try {
+            index = translator.readIndexData(data);
+            printer.printIndexData(index);
+        } catch (IOException e) {
+            System.out.println("Little problem has occured.");
+            System.out.println(e.getMessage());
+        }
     }
 
     //2. aktualną wartość parametry dla podanej nazwy stacji i nazwy parametru

@@ -1,7 +1,5 @@
 package http;
 
-import java.io.InputStream;
-
 //to extract input stream from http site, (to send http get)
 public class PolishHttpExtractor implements HttpExtractor {
     private static final String STATIONS_URL = "http://api.gios.gov.pl/pjp-api/rest/station/findAll";
@@ -11,13 +9,23 @@ public class PolishHttpExtractor implements HttpExtractor {
     private final ConnectionFactory connectionFactory = new ConnectionFactory();
 
     @Override
-    public InputStream extractIndexData(Integer stationId) {
+    public String extractIndexData(Integer stationId) {
         String requestURL = String.format(AIR_QUALITY_INDEX_URL_TEMPLATE, stationId.toString());
+        return connectAndExtract(requestURL);
+    }
 
+    @Override
+    public String extractAllStationsData() {
+        String requestURL = STATIONS_URL;
+        return connectAndExtract(requestURL);
+    }
+
+    private String connectAndExtract(String requestURL) {
         //try-with-resources
         try (HttpConnection connection = connectionFactory.build(requestURL)) {
-            InputStream inputStream = connection.getResponseAsInputStream();
-            return inputStream;
+            String response = connection.getResponseAsString();
+            return response;
         }
     }
+
 }

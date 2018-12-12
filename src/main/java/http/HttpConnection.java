@@ -44,17 +44,17 @@ public class HttpConnection implements Closeable {
         connection.disconnect();
     }
 
-    public String response() {
+    public String getResponseAsString() {
         responseCheck();
-        StringBuilder responseData = new StringBuilder();
+        StringBuilder response = new StringBuilder();
         try (BufferedReader responseReader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
             String line;
             while ((line = responseReader.readLine()) != null) {
-                responseData.append(line);
+                response.append(line);
             }
         } catch (IOException e) {
             throw new AppException(e);
         }
-        return responseData.toString();
+        return response.toString();
     }
 }

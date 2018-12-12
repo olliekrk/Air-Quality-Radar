@@ -8,6 +8,11 @@ public class ParamIndexLevel {
     private String indexLevelName;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    public ParamIndexLevel(String id, String indexLevelName) {
+        this.id = id;
+        this.indexLevelName = indexLevelName;
+    }
+
     public String getId() {
         return id;
     }
