@@ -2,12 +2,12 @@ package radar;
 
 import data.MeasurmentData;
 import data.MeasurmentValue;
-import data.Sensor;
 import data.Station;
 import http.HttpExtractor;
 import qualityIndex.AirQualityIndex;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 public abstract class AirQualityRadar {
 
@@ -19,47 +19,47 @@ public abstract class AirQualityRadar {
     //1. indeks jakości powietrza dla podanej nazwy stacji pommiarowej
     public void getAirQualityIndexForStation(String stationName) {
         Station station;
-        try {
-            station = adapter.findStationByName(stationName);
-        } catch (IOException e) {
-            System.out.println("Station with name: " + stationName + " could not be found.");
-            return;
-        }
-        String data = extractor.extractIndexData(station.getId());
         AirQualityIndex index;
         try {
+            station = adapter.findStationByName(stationName, extractor);
+            String data = extractor.extractIndexData(station.getId());
             index = translator.readIndexData(data);
-            printer.printIndexData(index);
         } catch (IOException e) {
-            System.out.println("Some problem has occured.");
             System.out.println(e.getMessage());
+            return;
         }
+        printer.printIndexData(index);
     }
 
     //2. aktualną wartość parametry dla podanej nazwy stacji i nazwy parametru
     public void getCurrentParamValueForStation(String stationName, String paramName) {
-        Station stationObj;
-        Sensor sensorObj;
+        MeasurmentData measurmentData;
+        MeasurmentValue latestMeasurment;
         try {
-            stationObj = adapter.findStationByName(stationName);
-            sensorObj = adapter.findSensor(stationObj.getId(), paramName);
-        } catch (IOException e) {
+            measurmentData = adapter.findData(stationName, paramName, extractor, translator);
+            latestMeasurment = Utils.latestMeasurment(measurmentData);
+        } catch (IOException | ParseException e) {
+            System.out.println("Exception thrown while getting current parameter value for given station.");
             System.out.println(e.getMessage());
+            e.printStackTrace();
             return;
         }
-
-        String sensorData = extractor.extractSensorData(sensorObj.getId());
-        MeasurmentData measurmentDataObj;
-        MeasurmentValue latestMeasurment;
-
-        measurmentDataObj = translator.readMeasurmentData(sensorData);
-        latestMeasurment = Utils.latestMeasurment(measurmentDataObj);
         printer.printCurrentMeasurment(stationName, paramName, latestMeasurment);
     }
 
     //3. średnia wartość podanego parametru za podany okres czasu
-    void getAverageParamValueForPeriod(String stationName, String paramName, String fromDate, String toDate) {
-
+    public void getAverageParamValueForPeriod(String stationName, String paramName, String fromDate, String toDate) {
+        MeasurmentData measurmentData;
+        double averageMeasurment = 0;
+        try {
+            measurmentData = adapter.findData(stationName, paramName, extractor, translator);
+            averageMeasurment = Utils.averageMeasurment(measurmentData, fromDate, toDate);
+        } catch (IOException | ParseException e) {
+            System.out.println("Exception thrown while getting average parameter value for given period");
+            System.out.println(e.getMessage());
+            return;
+        }
+        printer.printAverageMeasurment(stationName, paramName, fromDate, toDate, averageMeasurment);
     }
 
     //4. odszukanie parametru którego wartość, począwszy od podanego dnia uległa największym wahaniom

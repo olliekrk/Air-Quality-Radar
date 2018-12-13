@@ -1,11 +1,11 @@
 package radar;
 
 import com.google.gson.Gson;
+import data.MeasurmentData;
 import data.Param;
 import data.Sensor;
 import data.Station;
 import http.HttpExtractor;
-import http.PolishHttpExtractor;
 
 import java.io.IOException;
 import java.util.Date;
@@ -14,10 +14,8 @@ import java.util.Date;
 //do parsowania (szukania) odpowiednich obiektow po ich stringowych id
 public class PolishRadarAdapter implements RadarAdapter {
 
-    private HttpExtractor extractor = new PolishHttpExtractor();
-
     @Override
-    public Station findStationByName(String stationName) throws IOException {
+    public Station findStationByName(String stationName, HttpExtractor extractor) throws IOException {
         String allStations = extractor.extractAllStationsData();
         Gson gson = new Gson();
         Station[] stations = gson.fromJson(allStations, Station[].class);
@@ -30,7 +28,7 @@ public class PolishRadarAdapter implements RadarAdapter {
     }
 
     @Override
-    public Sensor findSensor(Integer stationId, String paramName) throws IOException {
+    public Sensor findSensor(Integer stationId, String paramName, HttpExtractor extractor) throws IOException {
         String allSensors = extractor.extractAllSensorsData(stationId);
         Sensor[] sensors = new Gson().fromJson(allSensors, Sensor[].class);
         for (Sensor sensor : sensors) {
@@ -39,6 +37,19 @@ public class PolishRadarAdapter implements RadarAdapter {
             }
         }
         throw new IOException("Could not find " + paramName + " sensor at station with ID: " + stationId);
+    }
+
+    @Override
+    public MeasurmentData findData(String stationName, String paramName, HttpExtractor extractor, RadarTranslator translator) throws IOException {
+        Station stationObj;
+        Sensor sensorObj;
+        stationObj = this.findStationByName(stationName, extractor);
+        sensorObj = this.findSensor(stationObj.getId(), paramName, extractor);
+
+        String sensorData = extractor.extractMeasurmentData(sensorObj.getId());
+        MeasurmentData measurmentData;
+        measurmentData = translator.readMeasurmentData(sensorData);
+        return measurmentData;
     }
 
     @Override

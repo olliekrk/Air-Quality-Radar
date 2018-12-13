@@ -11,7 +11,8 @@ public class PolishRadarPrinter implements RadarPrinter {
 
 
     private static final String paramIndexFormat = "Parameter: %s, \n CalculationDate: %s, \n IndexLevelName: %s, \n SourceDataDate: %s, \n";
-    private static final String measurmentValueFormat = "Station: %s, \n Parameter: %s, \n LatestMeasurmentDate: %s, \n MeasurmentValue: %s, \n";
+    private static final String currentMeasurmentValueFormat = "Station: %s, \n Parameter: %s, \n LatestMeasurmentDate: %s, \n MeasurmentValue: %s, \n";
+    private static final String averageMeasurmentValueFormat = "Station: %s, \n Parameter: %s, \n FromDate: %s, \n ToDate: %s, \n AverageMeasurmentValue: %s, \n";
     private static final String separator = String.join("", Collections.nCopies(40, "-")) + '\n';
 
 
@@ -33,7 +34,16 @@ public class PolishRadarPrinter implements RadarPrinter {
     public void printCurrentMeasurment(String stationName, String paramName, MeasurmentValue latestMeasurment) {
         StringBuilder result = new StringBuilder();
         result.append(separator);
-        result.append(String.format(measurmentValueFormat, stationName, paramName, latestMeasurment.getDate(), latestMeasurment.getValue()));
+        result.append(String.format(currentMeasurmentValueFormat, stationName, paramName, latestMeasurment.getDate(), latestMeasurment.getValue()));
+        result.append(separator);
+        System.out.println(result.toString());
+    }
+
+    @Override
+    public void printAverageMeasurment(String stationName, String paramName, String fromDate, String toDate, double averageMeasurment) {
+        StringBuilder result = new StringBuilder();
+        result.append(separator);
+        result.append(String.format(averageMeasurmentValueFormat, stationName, paramName, fromDate, toDate, (averageMeasurment == -1) ? null : averageMeasurment));
         result.append(separator);
         System.out.println(result.toString());
     }

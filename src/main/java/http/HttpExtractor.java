@@ -8,5 +8,5 @@ public interface HttpExtractor {
 
     String extractAllSensorsData(Integer stationId);
 
-    String extractSensorData(Integer sensorId);
+    String extractMeasurmentData(Integer sensorId);
 }

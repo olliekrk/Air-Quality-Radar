@@ -27,7 +27,7 @@ public class PolishHttpExtractor implements HttpExtractor {
     }
 
     @Override
-    public String extractSensorData(Integer sensorId) {
+    public String extractMeasurmentData(Integer sensorId) {
         String requestURL = String.format(DATA_URL_TEMPLATE, sensorId.toString());
         return connectAndExtract(requestURL);
     }
