@@ -1,7 +1,8 @@
 package radar;
 
-import data.MeasurmentData;
-import data.MeasurmentValue;
+import data.MeasurementValue;
+import data.MeasurementData;
+import data.Sensor;
 import data.Station;
 import http.HttpExtractor;
 import qualityIndex.AirQualityIndex;
@@ -33,38 +34,84 @@ public abstract class AirQualityRadar {
 
     //2. aktualną wartość parametry dla podanej nazwy stacji i nazwy parametru
     public void getCurrentParamValueForStation(String stationName, String paramName) {
-        MeasurmentData measurmentData;
-        MeasurmentValue latestMeasurment;
+        MeasurementData measurementData;
+        MeasurementValue latestMeasurment;
         try {
-            measurmentData = adapter.findData(stationName, paramName, extractor, translator);
-            latestMeasurment = Utils.latestMeasurment(measurmentData);
+            measurementData = adapter.findData(stationName, paramName, extractor, translator);
+            latestMeasurment = Utils.latestMeasurement(measurementData);
         } catch (IOException | ParseException e) {
             System.out.println("Exception thrown while getting current parameter value for given station.");
             System.out.println(e.getMessage());
             e.printStackTrace();
             return;
         }
-        printer.printCurrentMeasurment(stationName, paramName, latestMeasurment);
+        printer.printCurrentMeasurement(stationName, paramName, latestMeasurment);
     }
 
     //3. średnia wartość podanego parametru za podany okres czasu
     public void getAverageParamValueForPeriod(String stationName, String paramName, String fromDate, String toDate) {
-        MeasurmentData measurmentData;
+        MeasurementData measurementData;
         double averageMeasurment = 0;
         try {
-            measurmentData = adapter.findData(stationName, paramName, extractor, translator);
-            averageMeasurment = Utils.averageMeasurment(measurmentData, fromDate, toDate);
+            measurementData = adapter.findData(stationName, paramName, extractor, translator);
+            averageMeasurment = Utils.averageMeasurement(measurementData, fromDate, toDate);
         } catch (IOException | ParseException e) {
-            System.out.println("Exception thrown while getting average parameter value for given period");
+            System.out.println("Exception thrown while getting average parameter value for given period.");
             System.out.println(e.getMessage());
             return;
         }
-        printer.printAverageMeasurment(stationName, paramName, fromDate, toDate, averageMeasurment);
+        printer.printAverageMeasurement(stationName, paramName, fromDate, toDate, averageMeasurment);
     }
 
-    //4. odszukanie parametru którego wartość, począwszy od podanego dnia uległa największym wahaniom
-    void getParamWithMaxAmplitudeForPeriod(String stationName, String fromDate) {
+    //4. odszukanie parametru którego wartość, począwszy od podanej godziny(danego dnia) uległa największym wahaniom
+    public void getParamWithMaxAmplitudeForPeriod(String stationName, String fromDate) {
+        Station station;
+        String sensorsData;
+        Sensor[] sensors;
+        try {
+            station = adapter.findStationByName(stationName, extractor);
+            sensorsData = extractor.extractAllSensorsData(station.getId());
+            sensors = translator.readSensorsData(sensorsData);
 
+        } catch (IOException e) {
+            System.out.println("Exception thrown while getting parameter with max amplitude.");
+            System.out.println(e.getMessage());
+            return;
+        }
+        int N = sensors.length;
+        MeasurementData[] datas = new MeasurementData[N];
+        MeasurementValue[] maxValues = new MeasurementValue[N];
+        MeasurementValue[] minValues = new MeasurementValue[N];
+        double[] amplitudes = new double[N];
+
+        for (int i = 0; i < N; i++) {
+            Sensor sensor = sensors[i];
+            try {
+                MeasurementData data = adapter.findData(stationName, sensor.getParam().getParamCode(), extractor, translator);
+                datas[i] = data;
+            } catch (IOException e) {
+                datas[i] = null;
+            }
+        }
+        for (int i = 0; i < N; i++) {
+            try {
+                maxValues[i] = Utils.getMaxValue(datas[i], fromDate);
+                minValues[i] = Utils.getMinValue(datas[i], fromDate);
+                amplitudes[i] = maxValues[i] != null && minValues[i] != null ? Math.abs(maxValues[i].getValue() - minValues[i].getValue()) : -1;
+            } catch (ParseException e) {
+                System.out.println("Exception thrown while calculating amplitude for: " + sensors[i].getParam().getParamName());
+                System.out.println(e.getMessage());
+            }
+        }
+        double maxAmplitude = -1;
+        int index = -1;
+        for (int i = 0; i < N; i++) {
+            if (index == -1 || amplitudes[i] > maxAmplitude) {
+                index = i;
+                maxAmplitude = amplitudes[i];
+            }
+        }
+        printer.printMaxAmplitudeParameter(station.getStationName(), fromDate, sensors[index], maxValues[index], minValues[index]);
     }
 
     //5. odszukanie parametru którego wartość była najmniejsza w podanym dniu
@@ -78,7 +125,7 @@ public abstract class AirQualityRadar {
     }
 
     //7. dla podanego parametry wypisanie kiedy i gdzie miał on największą i najmniejszą wartość
-    void getParamMeasurmentInfo(String paramName) {
+    void getParamMeasurementInfo(String paramName) {
 
     }
 

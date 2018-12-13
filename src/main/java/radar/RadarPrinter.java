@@ -1,12 +1,15 @@
 package radar;
 
-import data.MeasurmentValue;
+import data.MeasurementValue;
+import data.Sensor;
 import qualityIndex.AirQualityIndex;
 
 public interface RadarPrinter {
     void printIndexData(AirQualityIndex index);
 
-    void printCurrentMeasurment(String stationName, String paramName, MeasurmentValue latestMeasurment);
+    void printCurrentMeasurement(String stationName, String paramName, MeasurementValue latestMeasurment);
 
-    void printAverageMeasurment(String stationName, String paramName, String fromDate, String toDate, double averageMeasurment);
+    void printAverageMeasurement(String stationName, String paramName, String fromDate, String toDate, double averageMeasurment);
+
+    void printMaxAmplitudeParameter(String stationName, String fromDate, Sensor sensor, MeasurementValue maxValue, MeasurementValue minValue);
 }

@@ -1,28 +1,29 @@
 package data;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class MeasurmentValue {
+public class MeasurementData {
 
-    private String date;
-    private Double value;
+    private String key;
+    private List<MeasurementValue> values = null;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public String getDate() {
-        return date;
+    public String getKey() {
+        return key;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setKey(String key) {
+        this.key = key;
     }
 
-    public Double getValue() {
-        return value;
+    public List<MeasurementValue> getValues() {
+        return values;
     }
 
-    public void setValue(Double value) {
-        this.value = value;
+    public void setValues(List<MeasurementValue> values) {
+        this.values = values;
     }
 
     public Map<String, Object> getAdditionalProperties() {

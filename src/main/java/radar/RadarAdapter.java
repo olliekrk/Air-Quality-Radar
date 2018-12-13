@@ -1,6 +1,6 @@
 package radar;
 
-import data.MeasurmentData;
+import data.MeasurementData;
 import data.Param;
 import data.Sensor;
 import data.Station;
@@ -15,7 +15,7 @@ public interface RadarAdapter {
 
     Sensor findSensor(Integer stationId, String paramName, HttpExtractor extractor) throws IOException;
 
-    MeasurmentData findData(String stationName, String paramName, HttpExtractor extractor, RadarTranslator translator) throws IOException;
+    MeasurementData findData(String stationName, String paramName, HttpExtractor extractor, RadarTranslator translator) throws IOException;
 
     Param findParamByName(String paramName);
 

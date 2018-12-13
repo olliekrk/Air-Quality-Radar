@@ -1,7 +1,7 @@
 package radar;
 
 import com.google.gson.Gson;
-import data.MeasurmentData;
+import data.MeasurementData;
 import data.Param;
 import data.Sensor;
 import data.Station;
@@ -40,16 +40,16 @@ public class PolishRadarAdapter implements RadarAdapter {
     }
 
     @Override
-    public MeasurmentData findData(String stationName, String paramName, HttpExtractor extractor, RadarTranslator translator) throws IOException {
+    public MeasurementData findData(String stationName, String paramName, HttpExtractor extractor, RadarTranslator translator) throws IOException {
         Station stationObj;
         Sensor sensorObj;
         stationObj = this.findStationByName(stationName, extractor);
         sensorObj = this.findSensor(stationObj.getId(), paramName, extractor);
 
-        String sensorData = extractor.extractMeasurmentData(sensorObj.getId());
-        MeasurmentData measurmentData;
-        measurmentData = translator.readMeasurmentData(sensorData);
-        return measurmentData;
+        String sensorData = extractor.extractMeasurementData(sensorObj.getId());
+        MeasurementData measurementData;
+        measurementData = translator.readMeasurementData(sensorData);
+        return measurementData;
     }
 
     @Override
