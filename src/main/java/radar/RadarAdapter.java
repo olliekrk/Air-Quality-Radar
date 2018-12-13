@@ -4,7 +4,6 @@ import data.MeasurementData;
 import data.Param;
 import data.Sensor;
 import data.Station;
-import http.HttpExtractor;
 
 import java.io.IOException;
 import java.util.Date;

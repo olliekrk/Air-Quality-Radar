@@ -2,7 +2,7 @@ package radar;
 
 import data.MeasurementValue;
 import data.Sensor;
-import qualityIndex.AirQualityIndex;
+import data.qualityIndex.AirQualityIndex;
 
 public interface RadarPrinter {
     void printIndexData(AirQualityIndex index);

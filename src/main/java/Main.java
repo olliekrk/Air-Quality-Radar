@@ -1,5 +1,5 @@
 import radar.AirQualityRadar;
-import radar.PolishRadar;
+import radar.polishGovApi.PolishRadar;
 
 public class Main {
     public static void main(String[] args) {

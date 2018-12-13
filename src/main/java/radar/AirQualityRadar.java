@@ -4,18 +4,17 @@ import data.MeasurementValue;
 import data.MeasurementData;
 import data.Sensor;
 import data.Station;
-import http.HttpExtractor;
-import qualityIndex.AirQualityIndex;
+import data.qualityIndex.AirQualityIndex;
 
 import java.io.IOException;
 import java.text.ParseException;
 
 public abstract class AirQualityRadar {
 
-    HttpExtractor extractor;
-    RadarAdapter adapter;
-    RadarPrinter printer;
-    RadarTranslator translator;
+    protected HttpExtractor extractor;
+    protected RadarAdapter adapter;
+    protected RadarPrinter printer;
+    protected RadarTranslator translator;
 
     //1. indeks jakości powietrza dla podanej nazwy stacji pommiarowej
     public void getAirQualityIndexForStation(String stationName) {
@@ -120,7 +119,7 @@ public abstract class AirQualityRadar {
     }
 
     //6. wypisanie N stanowisk pomiarowych, posortowanych rosnąco, które odnotowały największą wartość podanego parametru w podanym dniu
-    void getStationsWithMaxParamValueForDay(String stationName, String paramName, String date) {
+    void getNStationsWithMaxParamValueForDay(String stationName, String paramName, String day) {
 
     }
 

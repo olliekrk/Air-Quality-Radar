@@ -1,11 +1,13 @@
-package radar;
+package radar.polishGovApi;
 
 import com.google.gson.Gson;
 import data.MeasurementData;
 import data.Param;
 import data.Sensor;
 import data.Station;
-import http.HttpExtractor;
+import radar.HttpExtractor;
+import radar.RadarAdapter;
+import radar.RadarTranslator;
 
 import java.io.IOException;
 import java.util.Date;

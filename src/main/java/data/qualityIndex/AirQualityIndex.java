@@ -1,4 +1,4 @@
-package qualityIndex;
+package data.qualityIndex;
 
 import java.util.HashMap;
 import java.util.Map;

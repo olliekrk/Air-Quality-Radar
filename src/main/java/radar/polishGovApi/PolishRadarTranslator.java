@@ -1,4 +1,4 @@
-package radar;
+package radar.polishGovApi;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -6,9 +6,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import data.MeasurementData;
 import data.Sensor;
-import qualityIndex.AirQualityIndex;
-import qualityIndex.ParamIndex;
-import qualityIndex.ParamIndexLevel;
+import data.qualityIndex.AirQualityIndex;
+import data.qualityIndex.ParamIndex;
+import data.qualityIndex.ParamIndexLevel;
+import radar.RadarTranslator;
+import radar.Utils;
 
 import java.io.IOException;
 

@@ -1,4 +1,8 @@
-package http;
+package radar.polishGovApi;
+
+import radar.ConnectionFactory;
+import radar.HttpConnection;
+import radar.HttpExtractor;
 
 //to extract input stream from http site, (to send http get)
 public class PolishHttpExtractor implements HttpExtractor {

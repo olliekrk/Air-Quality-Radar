@@ -1,6 +1,6 @@
-package radar;
+package radar.polishGovApi;
 
-import http.PolishHttpExtractor;
+import radar.AirQualityRadar;
 
 public class PolishRadar extends AirQualityRadar {
 

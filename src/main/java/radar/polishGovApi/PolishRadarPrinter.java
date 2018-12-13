@@ -1,10 +1,11 @@
-package radar;
+package radar.polishGovApi;
 
 import data.MeasurementValue;
 import data.Sensor;
-import qualityIndex.AirQualityIndex;
-import qualityIndex.ParamIndex;
-import qualityIndex.ParamIndexLevel;
+import data.qualityIndex.AirQualityIndex;
+import data.qualityIndex.ParamIndex;
+import data.qualityIndex.ParamIndexLevel;
+import radar.RadarPrinter;
 
 import java.util.Collections;
 
