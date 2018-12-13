@@ -6,4 +6,7 @@ public interface HttpExtractor {
 
     String extractAllStationsData();
 
+    String extractAllSensorsData(Integer stationId);
+
+    String extractSensorData(Integer sensorId);
 }

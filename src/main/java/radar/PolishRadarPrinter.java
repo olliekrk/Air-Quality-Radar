@@ -1,5 +1,6 @@
 package radar;
 
+import data.MeasurmentValue;
 import qualityIndex.AirQualityIndex;
 import qualityIndex.ParamIndex;
 import qualityIndex.ParamIndexLevel;
@@ -8,8 +9,11 @@ import java.util.Collections;
 
 public class PolishRadarPrinter implements RadarPrinter {
 
-    private static final String paramIndexFormat = "Parameter: %s," + '\n' + "CalculationDate: %s," + '\n' + "IndexLevelName: %s, " + '\n' + "SourceDataDate: %s," + '\n';
+
+    private static final String paramIndexFormat = "Parameter: %s, \n CalculationDate: %s, \n IndexLevelName: %s, \n SourceDataDate: %s, \n";
+    private static final String measurmentValueFormat = "Station: %s, \n Parameter: %s, \n LatestMeasurmentDate: %s, \n MeasurmentValue: %s, \n";
     private static final String separator = String.join("", Collections.nCopies(40, "-")) + '\n';
+
 
     @Override
     public void printIndexData(AirQualityIndex index) {
@@ -22,6 +26,15 @@ public class PolishRadarPrinter implements RadarPrinter {
             result.append(info);
             result.append(separator);
         }
+        System.out.println(result.toString());
+    }
+
+    @Override
+    public void printCurrentMeasurment(String stationName, String paramName, MeasurmentValue latestMeasurment) {
+        StringBuilder result = new StringBuilder();
+        result.append(separator);
+        result.append(String.format(measurmentValueFormat, stationName, paramName, latestMeasurment.getDate(), latestMeasurment.getValue()));
+        result.append(separator);
         System.out.println(result.toString());
     }
 }

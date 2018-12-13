@@ -34,6 +34,3 @@ public class MeasurmentValue {
     }
 
 }
-
-//na 18
-//pierwsze cztery punkty zaimplementować

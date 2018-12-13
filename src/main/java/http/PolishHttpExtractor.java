@@ -20,6 +20,18 @@ public class PolishHttpExtractor implements HttpExtractor {
         return connectAndExtract(requestURL);
     }
 
+    @Override
+    public String extractAllSensorsData(Integer stationId) {
+        String requestURL = String.format(SENSORS_URL_TEMPLATE, stationId.toString());
+        return connectAndExtract(requestURL);
+    }
+
+    @Override
+    public String extractSensorData(Integer sensorId) {
+        String requestURL = String.format(DATA_URL_TEMPLATE, sensorId.toString());
+        return connectAndExtract(requestURL);
+    }
+
     private String connectAndExtract(String requestURL) {
         //try-with-resources
         try (HttpConnection connection = connectionFactory.build(requestURL)) {

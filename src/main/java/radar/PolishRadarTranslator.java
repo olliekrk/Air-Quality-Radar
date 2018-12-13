@@ -1,8 +1,10 @@
 package radar;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import data.MeasurmentData;
 import qualityIndex.AirQualityIndex;
 import qualityIndex.ParamIndex;
 import qualityIndex.ParamIndexLevel;
@@ -11,11 +13,12 @@ import java.io.IOException;
 
 public class PolishRadarTranslator implements RadarTranslator {
 
-    private static final int paramsCount = 8;
-    private static final String[] params = new String[]{"st", "so2", "no2", "co", "pm10", "pm25", "o3", "c6h6"};
-
     @Override
     public AirQualityIndex readIndexData(String data) throws IOException {
+
+        int paramsCount = Utils.getParamsCount();
+        String[] params = Utils.getParams();
+
         AirQualityIndex index = new AirQualityIndex();
 
         JsonParser jsonParser = new JsonParser();
@@ -52,6 +55,11 @@ public class PolishRadarTranslator implements RadarTranslator {
             index.setParamIndex(paramIndices);
             return index;
         }
-        throw new IOException();
+        throw new IOException("Air Quality Index Data could not be read.");
+    }
+
+    @Override
+    public MeasurmentData readMeasurmentData(String sensorData) {
+        return new Gson().fromJson(sensorData, MeasurmentData.class);
     }
 }

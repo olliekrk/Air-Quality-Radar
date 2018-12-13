@@ -7,7 +7,7 @@ import java.util.Map;
 public class MeasurmentData {
 
     private String key;
-    private List<MeasurmentValue> measurmentValues = null;
+    private List<MeasurmentValue> values = null;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     public String getKey() {
@@ -18,12 +18,12 @@ public class MeasurmentData {
         this.key = key;
     }
 
-    public List<MeasurmentValue> getMeasurmentValues() {
-        return measurmentValues;
+    public List<MeasurmentValue> getValues() {
+        return values;
     }
 
-    public void setMeasurmentValues(List<MeasurmentValue> measurmentValues) {
-        this.measurmentValues = measurmentValues;
+    public void setValues(List<MeasurmentValue> values) {
+        this.values = values;
     }
 
     public Map<String, Object> getAdditionalProperties() {

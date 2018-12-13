@@ -1,11 +1,13 @@
 package radar;
 
+import data.MeasurmentData;
+import data.MeasurmentValue;
+import data.Sensor;
 import data.Station;
 import http.HttpExtractor;
 import qualityIndex.AirQualityIndex;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 public abstract class AirQualityRadar {
 
@@ -29,14 +31,30 @@ public abstract class AirQualityRadar {
             index = translator.readIndexData(data);
             printer.printIndexData(index);
         } catch (IOException e) {
-            System.out.println("Little problem has occured.");
+            System.out.println("Some problem has occured.");
             System.out.println(e.getMessage());
         }
     }
 
     //2. aktualną wartość parametry dla podanej nazwy stacji i nazwy parametru
-    void getParamValueForStation(String stationName, String paramName) {
+    public void getCurrentParamValueForStation(String stationName, String paramName) {
+        Station stationObj;
+        Sensor sensorObj;
+        try {
+            stationObj = adapter.findStationByName(stationName);
+            sensorObj = adapter.findSensor(stationObj.getId(), paramName);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
 
+        String sensorData = extractor.extractSensorData(sensorObj.getId());
+        MeasurmentData measurmentDataObj;
+        MeasurmentValue latestMeasurment;
+
+        measurmentDataObj = translator.readMeasurmentData(sensorData);
+        latestMeasurment = Utils.latestMeasurment(measurmentDataObj);
+        printer.printCurrentMeasurment(stationName, paramName, latestMeasurment);
     }
 
     //3. średnia wartość podanego parametru za podany okres czasu
