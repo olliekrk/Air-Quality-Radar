@@ -1,7 +1,7 @@
 package radar;
 
-import data.MeasurementValue;
 import data.MeasurementData;
+import data.MeasurementValue;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -74,7 +74,23 @@ public class Utils {
         return valueMin;
     }
 
-    private static int compareDates(String date1, String date2) throws ParseException {
+    public static MeasurementValue getMinValueInDate(MeasurementData data, String date) throws ParseException {
+        String dateFrom = date + " 00:00:00";
+        String dateTo = date + " 23:59:00";
+        MeasurementValue min = null;
+        if (data != null) {
+            for (MeasurementValue value : data.getValues()) {
+                if (value != null && value.getValue() != null && compareDates(dateFrom, value.getDate()) <= 0 && compareDates(value.getDate(), dateTo) <= 0) {
+                    if (min == null || min.getValue() > value.getValue()) {
+                        min = value;
+                    }
+                }
+            }
+        }
+        return min;
+    }
+
+    public static int compareDates(String date1, String date2) throws ParseException {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date d1 = format.parse(date1);
         Date d2 = format.parse(date2);

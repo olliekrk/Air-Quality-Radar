@@ -13,8 +13,10 @@ import java.io.IOException;
 import java.util.Date;
 
 
-//do parsowania (szukania) odpowiednich obiektow po ich stringowych id
+//do szukania odpowiednich obiektow po ich stringowych id, przy pomocy extractora
 public class PolishRadarAdapter implements RadarAdapter {
+    //these methods work typically with polish API
+    //to make radar work with other API it is needed to create another class implementing RadarAdapter interface
 
     @Override
     public Station findStationByName(String stationName, HttpExtractor extractor) throws IOException {
@@ -42,16 +44,11 @@ public class PolishRadarAdapter implements RadarAdapter {
     }
 
     @Override
-    public MeasurementData findData(String stationName, String paramName, HttpExtractor extractor, RadarTranslator translator) throws IOException {
-        Station stationObj;
-        Sensor sensorObj;
-        stationObj = this.findStationByName(stationName, extractor);
-        sensorObj = this.findSensor(stationObj.getId(), paramName, extractor);
-
-        String sensorData = extractor.extractMeasurementData(sensorObj.getId());
-        MeasurementData measurementData;
-        measurementData = translator.readMeasurementData(sensorData);
-        return measurementData;
+    public MeasurementData findData(Integer stationId, String paramName, HttpExtractor extractor, RadarTranslator translator) throws IOException {
+        Sensor sensor = this.findSensor(stationId, paramName, extractor);
+        String measurementData = extractor.extractMeasurementData(sensor.getId());
+        MeasurementData measurement = translator.readMeasurementData(measurementData);
+        return measurement;
     }
 
     @Override

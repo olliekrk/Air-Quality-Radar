@@ -15,6 +15,7 @@ import radar.Utils;
 import java.io.IOException;
 
 public class PolishRadarTranslator implements RadarTranslator {
+    //these methods work typically with Polish Gov API
 
     @Override
     public AirQualityIndex readIndexData(String data) throws IOException {

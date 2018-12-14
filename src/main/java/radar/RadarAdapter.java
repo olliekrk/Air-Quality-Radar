@@ -14,7 +14,7 @@ public interface RadarAdapter {
 
     Sensor findSensor(Integer stationId, String paramName, HttpExtractor extractor) throws IOException;
 
-    MeasurementData findData(String stationName, String paramName, HttpExtractor extractor, RadarTranslator translator) throws IOException;
+    MeasurementData findData(Integer stationId, String paramName, HttpExtractor extractor, RadarTranslator translator) throws IOException;
 
     Param findParamByName(String paramName);
 

@@ -14,5 +14,7 @@ public class Main {
         radar.getAverageParamValueForPeriod("działoszyn", "pm10", example1Date, example2Date);
 //        4
         radar.getParamWithMaxAmplitudeForPeriod("działoszyn", example1Date);
+//        5
+        radar.getParamWithMinValueForDay("działoszyn", "2018-12-14");
     }
 }

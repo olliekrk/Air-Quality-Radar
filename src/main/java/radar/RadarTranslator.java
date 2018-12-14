@@ -9,7 +9,7 @@ import java.io.IOException;
 public interface RadarTranslator {
     AirQualityIndex readIndexData(String data) throws IOException;
 
-    MeasurementData readMeasurementData(String sensorData);
+    MeasurementData readMeasurementData(String measurementData);
 
     Sensor[] readSensorsData(String sensorsData);
 }
