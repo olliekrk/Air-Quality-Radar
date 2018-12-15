@@ -50,7 +50,7 @@ public abstract class AirQualityRadar {
     public void getAverageParamValueForPeriod(String stationName, String paramName, String fromDate, String toDate) {
         Station station;
         MeasurementData measurementData;
-        double averageMeasurment = 0;
+        double averageMeasurment;
         try {
             station = adapter.findStationByName(stationName, extractor, translator);
             measurementData = adapter.findData(station.getId(), paramName, extractor, translator);
@@ -94,8 +94,8 @@ public abstract class AirQualityRadar {
         }
         for (int i = 0; i < N; i++) {
             try {
-                maxValues[i] = Utils.getMaxValueFromDate(datas[i], fromDate);
-                minValues[i] = Utils.getMinValueFromDate(datas[i], fromDate);
+                maxValues[i] = Utils.getExtremeValue(datas[i], fromDate, null, "from", "max");
+                minValues[i] = Utils.getExtremeValue(datas[i], fromDate, null, "from", "max");
                 amplitudes[i] = maxValues[i] != null && minValues[i] != null ? Math.abs(maxValues[i].getValue() - minValues[i].getValue()) : -1;
             } catch (ParseException e) {
                 System.out.println("Exception thrown while calculating amplitude for: " + sensors[i].getParam().getParamName());
@@ -134,7 +134,7 @@ public abstract class AirQualityRadar {
             MeasurementData currentData = translator.readMeasurementData(currentMeasurment);
             MeasurementValue minimalSensorValue;
             try {
-                minimalSensorValue = Utils.getMinValueInDate(currentData, date);
+                minimalSensorValue = Utils.getExtremeValue(currentData, date, null, "in", "min");
             } catch (ParseException e) {
                 minimalSensorValue = null;
             }
@@ -157,7 +157,7 @@ public abstract class AirQualityRadar {
             try {
                 sensors[i] = adapter.findSensor(stations[i].getId(), paramName, extractor, translator);
                 MeasurementData measurementData = translator.readMeasurementData(extractor.extractMeasurementData(sensors[i].getId()));
-                maxValues[i] = Utils.getMaxValueInDate(measurementData, day);
+                maxValues[i] = Utils.getExtremeValue(measurementData, day, null, "in", "max");
             } catch (IOException | ParseException e) {
                 //there is no sensor of given param on this station
                 //or it was unable to get max measurement value
@@ -180,23 +180,24 @@ public abstract class AirQualityRadar {
         MeasurementValue value;
 
         Station[] stations = translator.readStationsData(extractor.extractAllStationsData());
-        for (int i = 0; i < stations.length; i++) {
+        for (Station station : stations) {
             try {
-                sensor = adapter.findSensor(stations[i].getId(), paramName, extractor, translator);
+                sensor = adapter.findSensor(station.getId(), paramName, extractor, translator);
                 data = translator.readMeasurementData(extractor.extractMeasurementData(sensor.getId()));
-                value = Utils.getMinValue(data);
+                value = Utils.getExtremeValue(data, null, null, "none", "min");
                 if (value != null && (minValue == null || minValue.getValue() > value.getValue())) {
                     minSensor = sensor;
                     minValue = value;
                 }
-                value = Utils.getMaxValue(data);
+                value = Utils.getExtremeValue(data, null, null, "none", "max");
                 if (value != null && (maxValue == null || maxValue.getValue() < value.getValue())) {
                     maxSensor = sensor;
                     maxValue = value;
                 }
 
-            } catch (IOException e) {
+            } catch (ParseException | IOException e) {
                 //unable to find param's sensor on this station
+                //or parse exception while getting extreme value
             }
         }
         printer.printParamExtremeValues(minSensor, minValue, maxSensor, maxValue);

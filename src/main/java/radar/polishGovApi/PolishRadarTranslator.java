@@ -64,8 +64,8 @@ public class PolishRadarTranslator implements RadarTranslator {
     }
 
     @Override
-    public MeasurementData readMeasurementData(String sensorData) {
-        return new Gson().fromJson(sensorData, MeasurementData.class);
+    public MeasurementData readMeasurementData(String measurementData) {
+        return new Gson().fromJson(measurementData, MeasurementData.class);
     }
 
     @Override
