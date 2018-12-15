@@ -1,6 +1,5 @@
 package radar.polishGovApi;
 
-import com.google.gson.Gson;
 import data.MeasurementData;
 import data.Param;
 import data.Sensor;
@@ -19,10 +18,9 @@ public class PolishRadarAdapter implements RadarAdapter {
     //to make radar work with other API it is needed to create another class implementing RadarAdapter interface
 
     @Override
-    public Station findStationByName(String stationName, HttpExtractor extractor) throws IOException {
-        String allStations = extractor.extractAllStationsData();
-        Gson gson = new Gson();
-        Station[] stations = gson.fromJson(allStations, Station[].class);
+    public Station findStationByName(String stationName, HttpExtractor extractor, RadarTranslator translator) throws IOException {
+        String allStationsData = extractor.extractAllStationsData();
+        Station[] stations = translator.readStationsData(allStationsData);
         for (Station station : stations) {
             if (station.getStationName().compareToIgnoreCase(stationName) == 0) {
                 return station;
@@ -32,9 +30,9 @@ public class PolishRadarAdapter implements RadarAdapter {
     }
 
     @Override
-    public Sensor findSensor(Integer stationId, String paramName, HttpExtractor extractor) throws IOException {
-        String allSensors = extractor.extractAllSensorsData(stationId);
-        Sensor[] sensors = new Gson().fromJson(allSensors, Sensor[].class);
+    public Sensor findSensor(Integer stationId, String paramName, HttpExtractor extractor, RadarTranslator translator) throws IOException {
+        String allSensorsData = extractor.extractAllSensorsData(stationId);
+        Sensor[] sensors = translator.readSensorsData(allSensorsData);
         for (Sensor sensor : sensors) {
             if (sensor.getParam().getParamCode().compareToIgnoreCase(paramName) == 0) {
                 return sensor;
@@ -45,10 +43,9 @@ public class PolishRadarAdapter implements RadarAdapter {
 
     @Override
     public MeasurementData findData(Integer stationId, String paramName, HttpExtractor extractor, RadarTranslator translator) throws IOException {
-        Sensor sensor = this.findSensor(stationId, paramName, extractor);
+        Sensor sensor = this.findSensor(stationId, paramName, extractor, translator);
         String measurementData = extractor.extractMeasurementData(sensor.getId());
-        MeasurementData measurement = translator.readMeasurementData(measurementData);
-        return measurement;
+        return translator.readMeasurementData(measurementData);
     }
 
     @Override

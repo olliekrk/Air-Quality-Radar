@@ -18,7 +18,7 @@ public abstract class AirQualityRadar {
         Station station;
         AirQualityIndex index;
         try {
-            station = adapter.findStationByName(stationName, extractor);
+            station = adapter.findStationByName(stationName, extractor, translator);
             String data = extractor.extractIndexData(station.getId());
             index = translator.readIndexData(data);
         } catch (IOException e) {
@@ -34,7 +34,7 @@ public abstract class AirQualityRadar {
         MeasurementData measurementData;
         MeasurementValue latestMeasurment;
         try {
-            station = adapter.findStationByName(stationName, extractor);
+            station = adapter.findStationByName(stationName, extractor, translator);
             measurementData = adapter.findData(station.getId(), paramName, extractor, translator);
             latestMeasurment = Utils.latestMeasurement(measurementData);
         } catch (IOException | ParseException e) {
@@ -52,7 +52,7 @@ public abstract class AirQualityRadar {
         MeasurementData measurementData;
         double averageMeasurment = 0;
         try {
-            station = adapter.findStationByName(stationName, extractor);
+            station = adapter.findStationByName(stationName, extractor, translator);
             measurementData = adapter.findData(station.getId(), paramName, extractor, translator);
             averageMeasurment = Utils.averageMeasurement(measurementData, fromDate, toDate);
         } catch (IOException | ParseException e) {
@@ -69,7 +69,7 @@ public abstract class AirQualityRadar {
         String sensorsData;
         Sensor[] sensors;
         try {
-            station = adapter.findStationByName(stationName, extractor);
+            station = adapter.findStationByName(stationName, extractor, translator);
             sensorsData = extractor.extractAllSensorsData(station.getId());
             sensors = translator.readSensorsData(sensorsData);
         } catch (IOException e) {
@@ -94,8 +94,8 @@ public abstract class AirQualityRadar {
         }
         for (int i = 0; i < N; i++) {
             try {
-                maxValues[i] = Utils.getMaxValue(datas[i], fromDate);
-                minValues[i] = Utils.getMinValue(datas[i], fromDate);
+                maxValues[i] = Utils.getMaxValueFromDate(datas[i], fromDate);
+                minValues[i] = Utils.getMinValueFromDate(datas[i], fromDate);
                 amplitudes[i] = maxValues[i] != null && minValues[i] != null ? Math.abs(maxValues[i].getValue() - minValues[i].getValue()) : -1;
             } catch (ParseException e) {
                 System.out.println("Exception thrown while calculating amplitude for: " + sensors[i].getParam().getParamName());
@@ -121,7 +121,7 @@ public abstract class AirQualityRadar {
         MeasurementValue minimalValue = null;
         Param minimalParam = null;
         try {
-            station = adapter.findStationByName(stationName, extractor);
+            station = adapter.findStationByName(stationName, extractor, translator);
             sensorsData = extractor.extractAllSensorsData(station.getId());
             sensors = translator.readSensorsData(sensorsData);
         } catch (IOException e) {
@@ -147,8 +147,24 @@ public abstract class AirQualityRadar {
     }
 
     //6. wypisanie N stanowisk pomiarowych, posortowanych rosnąco, które odnotowały największą wartość podanego parametru w podanym dniu
-    void getNStationsWithMaxParamValueForDay(String stationName, String paramName, String day) {
+    public void getNStationsWithMaxParamValueForDay(int N, String paramName, String day) {
+        String stationsData = extractor.extractAllStationsData();
+        Station[] stations = translator.readStationsData(stationsData);
+        Sensor[] sensors = new Sensor[stations.length];
+        MeasurementValue[] maxValues = new MeasurementValue[stations.length];
 
+        for (int i = 0; i < stations.length; i++) {
+            try {
+                sensors[i] = adapter.findSensor(stations[i].getId(), paramName, extractor, translator);
+                MeasurementData measurementData = translator.readMeasurementData(extractor.extractMeasurementData(sensors[i].getId()));
+                maxValues[i] = Utils.getMaxValueInDate(measurementData, day);
+            } catch (IOException | ParseException e) {
+                //there is no sensor of given param on this station
+                //or it was unable to get max measurement value
+                maxValues[i] = null;
+            }
+        }
+        printer.printNSensorsWithMaxParamValueForDay(N, paramName, day, stations, sensors, maxValues);
     }
 
     //7. dla podanego parametry wypisanie kiedy i gdzie miał on największą i najmniejszą wartość

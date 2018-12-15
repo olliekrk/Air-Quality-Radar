@@ -3,11 +3,13 @@ package radar.polishGovApi;
 import data.MeasurementValue;
 import data.Param;
 import data.Sensor;
+import data.Station;
 import data.qualityIndex.AirQualityIndex;
 import data.qualityIndex.ParamIndex;
 import data.qualityIndex.ParamIndexLevel;
 import radar.RadarPrinter;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 public class PolishRadarPrinter implements RadarPrinter {
@@ -19,6 +21,7 @@ public class PolishRadarPrinter implements RadarPrinter {
     private static final String averageMeasurementValueFormat = "Station: %s, \n     Parameter: %s, \n     FromDate: %s, \n     ToDate: %s, \n     AverageMeasurmentValue: %s, \n";
     private static final String singleMeasurementFormat = "     MeasurmentDate: %s, \n     MeasurementValue: %s, \n";
     private static final String measurementInfoFormat = "Station: %s, \n     Parameter: %s, \n     Date: %s, \n";
+    private static final String stationSensorFormat = "Station: %s, \n     Sensor: %s, \n";
     private static final String separator = String.join("", Collections.nCopies(40, "-")) + '\n';
 
     @Override
@@ -86,6 +89,60 @@ public class PolishRadarPrinter implements RadarPrinter {
                 .append("Minimal measured value: \n")
                 .append(String.format(singleMeasurementFormat, minimalValue.getDate(), minimalValue.getValue()))
                 .append(separator);
+
+        System.out.println(result.toString());
+    }
+
+    @Override
+    public void printNSensorsWithMaxParamValueForDay(int N, String paramName, String day, Station[] stations, Sensor[] sensors, MeasurementValue[] maxValues) {
+        class Tmp implements Comparable {
+            Station station;
+            Sensor sensor;
+            MeasurementValue value;
+
+            public Tmp(Station station, Sensor sensor, MeasurementValue value) {
+                this.station = station;
+                this.sensor = sensor;
+                this.value = value;
+            }
+
+            @Override
+            public int compareTo(Object o) {
+                Tmp other = (Tmp) o;
+                if (this.value == null) return 1;
+                if (other.value == null) return -1;
+                if (this.value == other.value) return 0;
+                return this.value.getValue() < other.value.getValue() ? -1 : 1;
+            }
+        }
+        Tmp[] tmps = new Tmp[stations.length];
+        for (int i = 0; i < stations.length; i++) {
+            tmps[i] = new Tmp(stations[i], sensors[i], maxValues[i]);
+        }
+        tmps = Arrays
+                .stream(tmps)
+                .filter(x -> x.value != null)
+                .sorted()
+                .toArray(Tmp[]::new);
+
+        //order after sorting:
+        //1,2,3,4,5
+
+        StringBuilder result = new StringBuilder();
+        result
+                .append(separator)
+                .append(N + " sensors with maximum parameter value for given day info. \n")
+                .append(String.format(measurementInfoFormat, "any", paramName, day))
+                .append(separator);
+
+        int start = tmps.length <= N ? 0 : tmps.length - N;
+        for (int i = start; i < tmps.length; i++) {
+            result
+                    .append("Nr " + (i+1) + " from "+ tmps.length +" \n")
+                    .append(String.format(stationSensorFormat, tmps[i].station.getStationName(), tmps[i].sensor.getId()))
+                    .append(String.format(singleMeasurementFormat, tmps[i].value.getDate(), tmps[i].value.getValue()))
+                    .append(separator);
+        }
 
         System.out.println(result.toString());
     }

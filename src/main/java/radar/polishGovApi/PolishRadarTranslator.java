@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import data.MeasurementData;
 import data.Sensor;
+import data.Station;
 import data.qualityIndex.AirQualityIndex;
 import data.qualityIndex.ParamIndex;
 import data.qualityIndex.ParamIndexLevel;
@@ -70,5 +71,10 @@ public class PolishRadarTranslator implements RadarTranslator {
     @Override
     public Sensor[] readSensorsData(String sensorsData) {
         return new Gson().fromJson(sensorsData, Sensor[].class);
+    }
+
+    @Override
+    public Station[] readStationsData(String stationsData) {
+        return new Gson().fromJson(stationsData, Station[].class);
     }
 }

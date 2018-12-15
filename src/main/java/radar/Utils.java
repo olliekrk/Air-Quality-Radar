@@ -46,7 +46,9 @@ public class Utils {
         return sum / count;
     }
 
-    public static MeasurementValue getMaxValue(MeasurementData data, String fromDate) throws ParseException {
+    //TODO: four below functions are duplicates
+
+    public static MeasurementValue getMaxValueFromDate(MeasurementData data, String fromDate) throws ParseException {
         MeasurementValue valueMax = null;
         if (data != null) {
             for (MeasurementValue value : data.getValues()) {
@@ -60,7 +62,7 @@ public class Utils {
         return valueMax;
     }
 
-    public static MeasurementValue getMinValue(MeasurementData data, String fromDate) throws ParseException {
+    public static MeasurementValue getMinValueFromDate(MeasurementData data, String fromDate) throws ParseException {
         MeasurementValue valueMin = null;
         if (data != null) {
             for (MeasurementValue value : data.getValues()) {
@@ -88,6 +90,22 @@ public class Utils {
             }
         }
         return min;
+    }
+
+    public static MeasurementValue getMaxValueInDate(MeasurementData data, String date) throws ParseException {
+        String dateFrom = date + " 00:00:00";
+        String dateTo = date + " 23:59:00";
+        MeasurementValue max = null;
+        if (data != null) {
+            for (MeasurementValue value : data.getValues()) {
+                if (value != null && value.getValue() != null && compareDates(dateFrom, value.getDate()) <= 0 && compareDates(value.getDate(), dateTo) <= 0) {
+                    if (max == null || max.getValue() < value.getValue()) {
+                        max = value;
+                    }
+                }
+            }
+        }
+        return max;
     }
 
     public static int compareDates(String date1, String date2) throws ParseException {

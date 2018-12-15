@@ -2,6 +2,7 @@ package radar;
 
 import data.MeasurementData;
 import data.Sensor;
+import data.Station;
 import data.qualityIndex.AirQualityIndex;
 
 import java.io.IOException;
@@ -12,4 +13,6 @@ public interface RadarTranslator {
     MeasurementData readMeasurementData(String measurementData);
 
     Sensor[] readSensorsData(String sensorsData);
+
+    Station[] readStationsData(String stationsData);
 }

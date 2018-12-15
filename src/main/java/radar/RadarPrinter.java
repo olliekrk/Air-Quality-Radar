@@ -3,6 +3,7 @@ package radar;
 import data.MeasurementValue;
 import data.Param;
 import data.Sensor;
+import data.Station;
 import data.qualityIndex.AirQualityIndex;
 
 public interface RadarPrinter {
@@ -15,4 +16,6 @@ public interface RadarPrinter {
     void printMaxAmplitudeParameter(String stationName, String fromDate, Sensor sensor, MeasurementValue maxValue, MeasurementValue minValue);
 
     void printMinMeasurementParameter(String stationName, MeasurementValue minimalValue, Param minimalParam, String date);
+
+    void printNSensorsWithMaxParamValueForDay(int N, String paramName, String day, Station[] stations, Sensor[] sensors, MeasurementValue[] maxValues);
 }
