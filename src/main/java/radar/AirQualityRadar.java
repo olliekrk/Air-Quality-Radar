@@ -168,8 +168,38 @@ public abstract class AirQualityRadar {
     }
 
     //7. dla podanego parametry wypisanie kiedy i gdzie miał on największą i najmniejszą wartość
-    void getParamMeasurementInfo(String paramName) {
+    public void getParamExtremeMeasurementValues(String paramName) {
 
+        MeasurementValue minValue = null;
+        MeasurementValue maxValue = null;
+        Sensor minSensor = null;
+        Sensor maxSensor = null;
+
+        Sensor sensor;
+        MeasurementData data;
+        MeasurementValue value;
+
+        Station[] stations = translator.readStationsData(extractor.extractAllStationsData());
+        for (int i = 0; i < stations.length; i++) {
+            try {
+                sensor = adapter.findSensor(stations[i].getId(), paramName, extractor, translator);
+                data = translator.readMeasurementData(extractor.extractMeasurementData(sensor.getId()));
+                value = Utils.getMinValue(data);
+                if (value != null && (minValue == null || minValue.getValue() > value.getValue())) {
+                    minSensor = sensor;
+                    minValue = value;
+                }
+                value = Utils.getMaxValue(data);
+                if (value != null && (maxValue == null || maxValue.getValue() < value.getValue())) {
+                    maxSensor = sensor;
+                    maxValue = value;
+                }
+
+            } catch (IOException e) {
+                //unable to find param's sensor on this station
+            }
+        }
+        printer.printParamExtremeValues(minSensor, minValue, maxSensor, maxValue);
     }
 
     //8. wykres

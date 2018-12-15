@@ -18,4 +18,6 @@ public interface RadarPrinter {
     void printMinMeasurementParameter(String stationName, MeasurementValue minimalValue, Param minimalParam, String date);
 
     void printNSensorsWithMaxParamValueForDay(int N, String paramName, String day, Station[] stations, Sensor[] sensors, MeasurementValue[] maxValues);
+
+    void printParamExtremeValues(Sensor minSensor, MeasurementValue minValue, Sensor maxSensor, MeasurementValue maxValue);
 }

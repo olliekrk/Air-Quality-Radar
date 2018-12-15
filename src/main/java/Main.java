@@ -3,9 +3,9 @@ import radar.polishGovApi.PolishRadar;
 
 public class Main {
     public static void main(String[] args) {
-        String todaysDate = "2018-12-15";
-        String example1Date = todaysDate + " 01:00:00";
-        String example2Date = todaysDate + " 08:00:00";
+        String todayDate = "2018-12-15";
+        String example1Date = todayDate + " 01:00:00";
+        String example2Date = todayDate + " 08:00:00";
         AirQualityRadar radar = new PolishRadar();
 //        1
         radar.getAirQualityIndexForStation("działoszyn");
@@ -16,10 +16,10 @@ public class Main {
 //        4
         radar.getParamWithMaxAmplitudeForPeriod("działoszyn", example1Date);
 //        5
-        radar.getParamWithMinValueForDay("działoszyn", todaysDate);
+        radar.getParamWithMinValueForDay("działoszyn", todayDate);
 //        6
-        radar.getNStationsWithMaxParamValueForDay(4, "so2", todaysDate);
+        radar.getNStationsWithMaxParamValueForDay(4, "pm10", todayDate);
 //        7
-
+        radar.getParamExtremeMeasurementValues("pm10");
     }
 }

@@ -46,7 +46,7 @@ public class Utils {
         return sum / count;
     }
 
-    //TODO: four below functions are duplicates
+    //TODO: six! below functions are duplicates
 
     public static MeasurementValue getMaxValueFromDate(MeasurementData data, String fromDate) throws ParseException {
         MeasurementValue valueMax = null;
@@ -106,6 +106,26 @@ public class Utils {
             }
         }
         return max;
+    }
+
+    public static MeasurementValue getMinValue(MeasurementData data) {
+        if (data == null) return null;
+        MeasurementValue result = null;
+        for (MeasurementValue value : data.getValues()) {
+            if (value != null && value.getValue() != null && (result == null || result.getValue() > value.getValue()))
+                result = value;
+        }
+        return result;
+    }
+
+    public static MeasurementValue getMaxValue(MeasurementData data) {
+        if (data == null) return null;
+        MeasurementValue result = null;
+        for (MeasurementValue value : data.getValues()) {
+            if (value != null && value.getValue() != null && (result == null || result.getValue() < value.getValue()))
+                result = value;
+        }
+        return result;
     }
 
     public static int compareDates(String date1, String date2) throws ParseException {
