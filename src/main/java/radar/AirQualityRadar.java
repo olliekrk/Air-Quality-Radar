@@ -205,4 +205,14 @@ public abstract class AirQualityRadar {
 
     //8. wykres
     //...
+
+    /*
+    TODO: 1. wykres
+    TODO: 2. uruchamianie z IO
+    TODO: 3. jar
+    TODO: 4. testy - Mockito
+    TODO: 5. wzorzec projektowy
+    TODO: 6. serializacja?
+    TODO: opisy funkcjonalności się zmieniają, sprawdzać
+     */
 }

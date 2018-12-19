@@ -82,7 +82,7 @@ public class Utils {
         return result;
     }
 
-    private static int compareDates(String date1, String date2) throws ParseException {
+    public static int compareDates(String date1, String date2) throws ParseException {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date d1 = format.parse(date1);
         Date d2 = format.parse(date2);
