@@ -1,8 +1,10 @@
 import radar.AirQualityRadar;
+import radar.cache.CacheUser;
 import radar.polishGovApi.PolishRadar;
 
 public class Main {
-    public static void main(String[] args) {
+
+    public static void noCacheTest() {
         String todayDate = "2018-12-19";
         String example1Date = todayDate + " 01:00:00";
         String example2Date = todayDate + " 08:00:00";
@@ -22,6 +24,17 @@ public class Main {
         radar.getNStationsWithMaxParamValueForDay(4, "so2", todayDate);
 //        7
         radar.getParamExtremeMeasurementValues("so2");
+
+    }
+
+    public static void cachedTest() {
+        AirQualityRadar radar = new PolishRadar();
+        CacheUser cacheUser = new CacheUser(radar);
+        cacheUser.useCache();
+    }
+
+    public static void main(String[] args) {
+        cachedTest();
     }
 }
 

@@ -3,14 +3,14 @@ package radar.cache;
 import data.MeasurementData;
 import data.Sensor;
 import data.Station;
-import data.qualityIndex.AirQualityIndex;
+import data.AirQualityIndex;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-class CacheSerializer implements Serializable {
+class Cache implements Serializable {
 
     private LocalDateTime updateDate;
     private Map<String, Station> allStations;
@@ -18,7 +18,7 @@ class CacheSerializer implements Serializable {
     private Map<Integer, MeasurementData> allData;
     private Map<Integer, AirQualityIndex> allIndices;
 
-    CacheSerializer(LocalDateTime updateDate, Map<String, Station> allStations, Map<Integer, List<Sensor>> allSensors, Map<Integer, MeasurementData> allData, Map<Integer, AirQualityIndex> allIndices) {
+    Cache(LocalDateTime updateDate, Map<String, Station> allStations, Map<Integer, List<Sensor>> allSensors, Map<Integer, MeasurementData> allData, Map<Integer, AirQualityIndex> allIndices) {
         this.updateDate = updateDate;
         this.allStations = allStations;
         this.allSensors = allSensors;

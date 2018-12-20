@@ -4,9 +4,9 @@ import data.MeasurementValue;
 import data.Param;
 import data.Sensor;
 import data.Station;
-import data.qualityIndex.AirQualityIndex;
-import data.qualityIndex.ParamIndex;
-import data.qualityIndex.ParamIndexLevel;
+import data.AirQualityIndex;
+import data.ParamIndex;
+import data.ParamIndexLevel;
 import radar.RadarPrinter;
 
 import java.util.Arrays;

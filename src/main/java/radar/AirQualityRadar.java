@@ -1,7 +1,7 @@
 package radar;
 
 import data.*;
-import data.qualityIndex.AirQualityIndex;
+import data.AirQualityIndex;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -215,4 +215,20 @@ public abstract class AirQualityRadar {
     TODO: 6. serializacja?
     TODO: opisy funkcjonalności się zmieniają, sprawdzać
      */
+
+    public HttpExtractor getExtractor() {
+        return extractor;
+    }
+
+    public RadarAdapter getAdapter() {
+        return adapter;
+    }
+
+    public RadarPrinter getPrinter() {
+        return printer;
+    }
+
+    public RadarTranslator getTranslator() {
+        return translator;
+    }
 }

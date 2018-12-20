@@ -1,6 +1,5 @@
 package data;
 
-//todo: use this
 public enum ParamType {
     PM10("PM10"),
     PM25("PM2.5"),
@@ -13,5 +12,13 @@ public enum ParamType {
 
     ParamType(String paramFormula) {
         this.paramFormula = paramFormula;
+    }
+
+    public static ParamType getParam(String paramName) {
+        return ParamType.valueOf(paramName.toUpperCase());
+    }
+
+    public String getParamFormula() {
+        return paramFormula;
     }
 }

@@ -1,7 +1,6 @@
 package radar.polishGovApi;
 
 import data.MeasurementData;
-import data.Param;
 import data.Sensor;
 import data.Station;
 import radar.HttpExtractor;
@@ -9,7 +8,6 @@ import radar.RadarAdapter;
 import radar.RadarTranslator;
 
 import java.io.IOException;
-import java.util.Date;
 
 
 //do szukania odpowiednich obiektow po ich stringowych id, przy pomocy extractora
@@ -46,15 +44,5 @@ public class PolishRadarAdapter implements RadarAdapter {
         Sensor sensor = this.findSensor(stationId, paramName, extractor, translator);
         String measurementData = extractor.extractMeasurementData(sensor.getId());
         return translator.readMeasurementData(measurementData);
-    }
-
-    @Override
-    public Param findParamByName(String paramName) {
-        return null;
-    }
-
-    @Override
-    public Date findDateByName(String date) {
-        return null;
     }
 }

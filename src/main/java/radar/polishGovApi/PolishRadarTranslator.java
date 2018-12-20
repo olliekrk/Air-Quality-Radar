@@ -7,9 +7,9 @@ import com.google.gson.JsonParser;
 import data.MeasurementData;
 import data.Sensor;
 import data.Station;
-import data.qualityIndex.AirQualityIndex;
-import data.qualityIndex.ParamIndex;
-import data.qualityIndex.ParamIndexLevel;
+import data.AirQualityIndex;
+import data.ParamIndex;
+import data.ParamIndexLevel;
 import radar.RadarTranslator;
 import radar.Utils;
 

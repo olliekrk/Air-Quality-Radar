@@ -4,7 +4,7 @@ import data.MeasurementValue;
 import data.Param;
 import data.Sensor;
 import data.Station;
-import data.qualityIndex.AirQualityIndex;
+import data.AirQualityIndex;
 
 public interface RadarPrinter {
     void printIndexData(AirQualityIndex index);

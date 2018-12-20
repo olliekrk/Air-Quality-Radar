@@ -16,7 +16,4 @@ public interface RadarAdapter {
 
     MeasurementData findData(Integer stationId, String paramName, HttpExtractor extractor, RadarTranslator translator) throws IOException;
 
-    Param findParamByName(String paramName);
-
-    Date findDateByName(String date);
 }

@@ -1,6 +1,6 @@
-package radar;
+package radar.cache;
 
-public class ConnectionFactory {
+public class HttpConnectionFactory {
     public HttpConnection build (String url){
         return new HttpConnection(url);
     }

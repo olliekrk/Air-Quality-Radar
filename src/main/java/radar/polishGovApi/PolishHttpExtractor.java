@@ -1,7 +1,7 @@
 package radar.polishGovApi;
 
-import radar.ConnectionFactory;
-import radar.HttpConnection;
+import radar.cache.HttpConnectionFactory;
+import radar.cache.HttpConnection;
 import radar.HttpExtractor;
 
 //to extract input stream from http site, (to send http get)
@@ -10,7 +10,7 @@ public class PolishHttpExtractor implements HttpExtractor {
     private static final String SENSORS_URL_TEMPLATE = "http://api.gios.gov.pl/pjp-api/rest/station/sensors/%s";
     private static final String DATA_URL_TEMPLATE = "http://api.gios.gov.pl/pjp-api/rest/data/getData/%s";
     private static final String AIR_QUALITY_INDEX_URL_TEMPLATE = "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/%s";
-    private final ConnectionFactory connectionFactory = new ConnectionFactory();
+    private final HttpConnectionFactory httpConnectionFactory = new HttpConnectionFactory();
 
     @Override
     public String extractIndexData(Integer stationId) {
@@ -38,7 +38,7 @@ public class PolishHttpExtractor implements HttpExtractor {
 
     private String connectAndExtract(String requestURL) {
         //try-with-resources
-        try (HttpConnection connection = connectionFactory.build(requestURL)) {
+        try (HttpConnection connection = httpConnectionFactory.build(requestURL)) {
             String response = connection.getResponseAsString();
             return response;
         }
