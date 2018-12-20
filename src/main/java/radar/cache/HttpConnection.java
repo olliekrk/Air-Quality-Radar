@@ -1,7 +1,5 @@
 package radar.cache;
 
-import exceptions.AppException;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -14,7 +12,7 @@ public class HttpConnection implements Closeable {
         try {
             connection = (HttpURLConnection) new URL(url).openConnection();
         } catch (IOException e) {
-            throw new AppException(e);
+            throw new HttpConnectionException(e.getMessage());
         }
     }
 
@@ -23,19 +21,19 @@ public class HttpConnection implements Closeable {
         try {
             return this.connection.getInputStream();
         } catch (IOException e) {
-            throw new AppException(e);
+            throw new HttpConnectionException(e.getMessage());
         }
     }
 
-    void responseCheck() throws AppException {
+    void responseCheck() {
         try {
             int response = connection.getResponseCode();
             if (response != 200) {
                 String msg = connection.getResponseMessage();
-                throw new AppException(response + ": There was a problem with HTTP connection: " + msg);
+                throw new HttpConnectionException(response + ": There was a problem with HTTP connection: " + msg);
             }
         } catch (IOException e) {
-            throw new AppException(e);
+            throw new HttpConnectionException(e.getMessage());
         }
     }
 
@@ -53,7 +51,7 @@ public class HttpConnection implements Closeable {
                 response.append(line);
             }
         } catch (IOException e) {
-            throw new AppException(e);
+            throw new HttpConnectionException(e.getMessage());
         }
         return response.toString();
     }

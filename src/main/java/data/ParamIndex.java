@@ -6,7 +6,7 @@ import java.util.Map;
 public class ParamIndex {
     private String paramName;
     private String calcDate;
-    private Object paramIndexLevel;
+    private ParamIndexLevel paramIndexLevel;
     private String sourceDataDate;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -26,11 +26,11 @@ public class ParamIndex {
         this.calcDate = calcDate;
     }
 
-    public Object getParamIndexLevel() {
+    public ParamIndexLevel getParamIndexLevel() {
         return paramIndexLevel;
     }
 
-    public void setParamIndexLevel(Object paramIndexLevel) {
+    public void setParamIndexLevel(ParamIndexLevel paramIndexLevel) {
         this.paramIndexLevel = paramIndexLevel;
     }
 

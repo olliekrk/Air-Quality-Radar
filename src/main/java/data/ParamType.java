@@ -1,5 +1,7 @@
 package data;
 
+import java.util.Arrays;
+
 public enum ParamType {
     PM10("PM10"),
     PM25("PM2.5"),
@@ -20,5 +22,17 @@ public enum ParamType {
 
     public String getParamFormula() {
         return paramFormula;
+    }
+
+    public static String[] getAllParamCodes() {
+        return Arrays.stream(ParamType.values()).map(Enum::name).toArray(String[]::new);
+    }
+
+    public String[] getAllParamFormulas() {
+        return Arrays.stream(ParamType.values()).map(x -> getParamFormula()).toArray(String[]::new);
+    }
+
+    public static int getParamCount() {
+        return ParamType.values().length;
     }
 }

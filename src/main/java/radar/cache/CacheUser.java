@@ -1,27 +1,30 @@
 package radar.cache;
 
-import radar.AirQualityRadar;
-
 public class CacheUser {
 
     //TODO:można pododwać flagi żeby nie aktualizować za każdym razem całego cache'a
     // tylko aktualizować to czego chce klient (wiemy po parametrach wywolania programu)
 
     private static boolean updatesAllowed = true;
-    private static String cachePath = "radarCache.json";
+    private final static String cachePath = "radarCache.json";
 
     private Cache cache;
     private CacheManager cacheManager;
-    private AirQualityRadar radar;
+    private CacheRadar radar;
 
-    public CacheUser(AirQualityRadar radar) {
+    public CacheUser(CacheRadar radar) {
         this.radar = radar;
-        this.cache = null;
         this.cacheManager = new CacheManager(cachePath);
+        this.prepareCache();
     }
 
-    public void useCache() {
+    private void prepareCache() {
         cache = cacheManager.loadCache(radar.getExtractor(), radar.getTranslator(), updatesAllowed);
+        this.radar.seeker = new CacheSeeker(cache);
+    }
+
+    public static boolean areUpdatesAllowed() {
+        return updatesAllowed;
     }
 
     public static void setUpdatesAllowed(boolean updatesAllowed) {

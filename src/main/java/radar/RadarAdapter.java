@@ -1,12 +1,12 @@
 package radar;
 
 import data.MeasurementData;
-import data.Param;
 import data.Sensor;
 import data.Station;
+import radar.cache.HttpExtractor;
+import radar.cache.RadarTranslator;
 
 import java.io.IOException;
-import java.util.Date;
 
 public interface RadarAdapter {
 

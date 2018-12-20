@@ -1,5 +1,8 @@
 import radar.AirQualityRadar;
+import radar.cache.CacheRadar;
+import radar.cache.CacheRadarGov;
 import radar.cache.CacheUser;
+import radar.cache.MissingDataException;
 import radar.polishGovApi.PolishRadar;
 
 public class Main {
@@ -28,9 +31,13 @@ public class Main {
     }
 
     public static void cachedTest() {
-        AirQualityRadar radar = new PolishRadar();
+        CacheRadar radar = new CacheRadarGov();
         CacheUser cacheUser = new CacheUser(radar);
-        cacheUser.useCache();
+        try {
+            radar.getAirQualityIndexForStation("Działoszyn");
+        } catch (MissingDataException e) {
+            System.out.println("kupa");
+        }
     }
 
     public static void main(String[] args) {

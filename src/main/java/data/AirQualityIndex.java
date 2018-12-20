@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class AirQualityIndex {
     private Integer id;
-    private Object[] paramIndex;
+    private ParamIndex[] paramIndex;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     public Integer getId() {
@@ -16,11 +16,11 @@ public class AirQualityIndex {
         this.id = id;
     }
 
-    public Object[] getParamIndex() {
+    public ParamIndex[] getParamIndex() {
         return paramIndex;
     }
 
-    public void setParamIndex(Object[] paramIndex) {
+    public void setParamIndex(ParamIndex[] paramIndex) {
         this.paramIndex = paramIndex;
     }
 

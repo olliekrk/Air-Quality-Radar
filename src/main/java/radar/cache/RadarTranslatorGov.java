@@ -1,28 +1,24 @@
-package radar.polishGovApi;
+package radar.cache;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import data.MeasurementData;
-import data.Sensor;
-import data.Station;
-import data.AirQualityIndex;
-import data.ParamIndex;
-import data.ParamIndexLevel;
-import radar.RadarTranslator;
-import radar.Utils;
+import data.*;
 
 import java.io.IOException;
 
-public class PolishRadarTranslator implements RadarTranslator {
-    //these methods work typically with Polish Gov API
+/**
+ * Class implementing {@link RadarTranslator} interface, which methods
+ * work typically with Polish Gov API.
+ */
+public class RadarTranslatorGov implements RadarTranslator {
 
     @Override
     public AirQualityIndex readIndexData(String data) throws IOException {
 
-        int paramsCount = Utils.getParamsCount();
-        String[] params = Utils.getParams();
+        int paramsCount = ParamType.getParamCount();
+        String[] paramCodes = ParamType.getAllParamCodes();
 
         AirQualityIndex index = new AirQualityIndex();
 
@@ -37,9 +33,9 @@ public class PolishRadarTranslator implements RadarTranslator {
             for (int i = 0; i < paramsCount; i++) {
                 paramIndices[i] = new ParamIndex();
 
-                JsonElement calcDateEl = indexObject.get(params[i].concat("CalcDate"));
-                JsonElement sourceDataDateEl = indexObject.get(params[i].concat("SourceDataDate"));
-                JsonElement indexElement = indexObject.get(params[i].concat("IndexLevel"));
+                JsonElement calcDateEl = indexObject.get(paramCodes[i].toLowerCase().concat("CalcDate"));
+                JsonElement sourceDataDateEl = indexObject.get(paramCodes[i].toLowerCase().concat("SourceDataDate"));
+                JsonElement indexElement = indexObject.get(paramCodes[i].toLowerCase().concat("IndexLevel"));
 
                 String calcDate = calcDateEl.isJsonNull() ? null : calcDateEl.getAsString();
                 String sourceDataDate = sourceDataDateEl.isJsonNull() ? null : sourceDataDateEl.getAsString();
@@ -51,7 +47,7 @@ public class PolishRadarTranslator implements RadarTranslator {
                     String indexLevelName = indexLevel.get("indexLevelName").getAsString();
                     paramIndexLevel = new ParamIndexLevel(indexLevelId, indexLevelName);
                 }
-                paramIndices[i].setParamName(params[i]);
+                paramIndices[i].setParamName(paramCodes[i]);
                 paramIndices[i].setCalcDate(calcDate);
                 paramIndices[i].setParamIndexLevel(paramIndexLevel);
                 paramIndices[i].setSourceDataDate(sourceDataDate);

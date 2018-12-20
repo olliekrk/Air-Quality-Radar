@@ -10,17 +10,6 @@ import java.util.Date;
 
 public class Utils {
 
-    private static final int paramsCount = 8;
-    private static final String[] params = new String[]{"st", "so2", "no2", "co", "pm10", "pm25", "o3", "c6h6"};
-
-    public static int getParamsCount() {
-        return paramsCount;
-    }
-
-    public static String[] getParams() {
-        return params;
-    }
-
     static MeasurementValue latestMeasurement(MeasurementData measurementData) throws ParseException {
         MeasurementValue latest = null;
         for (MeasurementValue value : measurementData.getValues()) {
@@ -88,19 +77,5 @@ public class Utils {
         Date d2 = format.parse(date2);
         return d1.compareTo(d2);
         //-1 jesli d1 jest wczesniej
-    }
-
-    //if we would like to input i.e. only hour
-    public static String todayDate(String someTime) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date today = new Date();
-
-        //if only single digit representing hour is given
-        if (someTime.length() == 1) someTime = "0" + someTime;
-
-        //if only hour is given
-        if (someTime.length() < 3) someTime += ":00:00";
-
-        return dateFormat.format(today).replaceFirst("\\d{2}:\\d{2}:\\d{2}", someTime);
     }
 }

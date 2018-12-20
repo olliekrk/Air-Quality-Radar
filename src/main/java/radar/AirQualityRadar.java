@@ -2,6 +2,9 @@ package radar;
 
 import data.*;
 import data.AirQualityIndex;
+import radar.cache.HttpExtractor;
+import radar.cache.RadarPrinter;
+import radar.cache.RadarTranslator;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -25,7 +28,7 @@ public abstract class AirQualityRadar {
             System.out.println(e.getMessage());
             return;
         }
-        printer.printIndexData(index);
+        printer.printIndexData(station, index);
     }
 
     //2. aktualną wartość parametry dla podanej nazwy stacji i nazwy parametru

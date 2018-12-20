@@ -1,18 +1,11 @@
-package radar.polishGovApi;
+package radar.cache;
 
-import data.MeasurementValue;
-import data.Param;
-import data.Sensor;
-import data.Station;
-import data.AirQualityIndex;
-import data.ParamIndex;
-import data.ParamIndexLevel;
-import radar.RadarPrinter;
+import data.*;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-public class PolishRadarPrinter implements RadarPrinter {
+public class RadarPrinterGov implements RadarPrinter {
     //this methods are actually universal and they work not only with Polish Gov API
     //rename this just to DefaultRadarPrinter?
 
@@ -26,15 +19,20 @@ public class PolishRadarPrinter implements RadarPrinter {
     private static final String stationSensorParamFormat = "     StationId: %s, \n     Sensor: %s, \n     Parameter: %s, \n";
     private static final String stationSensorFormat = "StationName: %s, \n     Sensor: %s, \n";
 
+    private static final String stationFormat = "StationName: %s, \nStationId: %s, \n";
+    private static final String sensorFormat = "    SensorParam: %s, \n     SensorId: %s, \n";
+    private static final String twoDatesFormat = "    FromDate: %s, \n    ToDate: %s, \n";
+    private static final String oneDateFormat = "    Date: %s, \n";
+
     @Override
-    public void printIndexData(AirQualityIndex index) {
+    public void printIndexData(Station station, AirQualityIndex index) {
         StringBuilder result = new StringBuilder();
         result
                 .append(separator)
                 .append("Air quality index for given station info. \n")
-                .append("Id: ")
-                .append(index.getId())
-                .append("\n")
+                .append("StationName: ").append(station.getStationName()).append("\n")
+                .append("StationId: ").append(station.getId()).append("\n")
+                .append("IndexId: ").append(index.getId()).append("\n")
                 .append(separator);
 
         ParamIndex[] params = (ParamIndex[]) index.getParamIndex();
@@ -172,6 +170,88 @@ public class PolishRadarPrinter implements RadarPrinter {
                 .append(String.format(stationSensorParamFormat, maxSensor.getStationId(), maxSensor.getId(), maxSensor.getParam().getParamName()))
                 .append(String.format(defaultMeasurementInfoFormat, maxValue.getDate(), maxValue.getValue()))
                 .append(separator);
+        System.out.println(result.toString());
+    }
+
+    @Override
+    public void printExtremeParamValuesPeriod(Station station, String fromDate, String toDate, Sensor currentSensor, MeasurementValue currentMin, MeasurementValue currentMax) {
+        StringBuilder result = new StringBuilder();
+        result
+                .append(separator)
+                .append("Parameter with maximum amplitude info. \n")
+                .append(String.format(stationFormat, station.getStationName(), station.getId()))
+                .append(separator)
+                .append(String.format(sensorFormat, currentSensor.getParam().getParamName(), currentSensor.getId()))
+                .append(separator)
+                .append(String.format(twoDatesFormat, fromDate, toDate))
+                .append(separator)
+                .append("Maximum: \n")
+                .append(String.format(defaultMeasurementInfoFormat, currentMax.getDate(), currentMax.getValue()))
+                .append(separator)
+                .append("Minimum: \n")
+                .append(String.format(defaultMeasurementInfoFormat, currentMin.getDate(), currentMin.getValue()))
+                .append(separator);
+
+        System.out.println(result.toString());
+    }
+
+    @Override
+    public void printParamMinimalValue(Station station, Sensor currentSensor, MeasurementValue currentMin, String date) {
+        StringBuilder result = new StringBuilder();
+        result
+                .append(separator)
+                .append("Parameter with minimal measurement value for given station and day info. \n")
+                .append(String.format(stationFormat, station.getStationName(), station.getId()))
+                .append(separator)
+                .append(String.format(sensorFormat, currentSensor.getParam().getParamName(), currentSensor.getId()))
+                .append("Minimal measured value: \n")
+                .append(String.format(oneDateFormat, date))
+                .append(String.format(defaultMeasurementInfoFormat, currentMin.getDate(), currentMin.getValue()))
+                .append(separator);
+
+        System.out.println(result.toString());
+    }
+
+    @Override
+    public void printExtremeParamValuesWhereAndWhen(String paramName, Station minStation, Sensor minSensor, MeasurementValue minValue, Station maxStation, Sensor maxSensor, MeasurementValue maxValue) {
+        StringBuilder result = new StringBuilder();
+        result
+                .append(separator)
+                .append("Minimum and maximum measurement values for given parameter info. \n")
+
+                .append(separator)
+                .append("Minimum: \n")
+                .append(String.format(stationFormat, minStation.getStationName(), minStation.getId()))
+                .append(String.format(sensorFormat, minSensor.getParam().getParamName(), minSensor.getId()))
+                .append(String.format(defaultMeasurementInfoFormat, minValue.getDate(), minValue.getValue()))
+
+                .append(separator)
+                .append("Maximum: \n")
+                .append(String.format(stationFormat, maxStation.getStationName(), maxStation.getId()))
+                .append(String.format(sensorFormat, minSensor.getParam().getParamName(), minSensor.getId()))
+                .append(String.format(defaultMeasurementInfoFormat, maxValue.getDate(), maxValue.getValue()));
+
+        System.out.println(result.toString());
+    }
+
+    @Override
+    public void printNSensors(Station station, Sensor[] sortedSensors, MeasurementValue[] sortedValues, String dateHour, String paramCode, int n) {
+        StringBuilder result = new StringBuilder();
+        result
+                .append(separator)
+                .append(n + " sensors with maximum parameter value for given day info. \n")
+                .append(String.format(stationFormat, station.getStationName(), station.getId()))
+                .append(String.format(oneDateFormat, dateHour))
+                .append(paramCode)
+                .append(separator);
+
+        for (int i = 0; i < sortedSensors.length; i++) {
+            result
+                    .append("Top " + (n - i))
+                    .append(String.format(sensorFormat, sortedSensors[i].getParam().getParamName(), sortedSensors[i].getId()))
+                    .append(String.format(defaultMeasurementInfoFormat, sortedValues[i].getDate(), sortedValues[i].getValue()))
+                    .append(separator);
+        }
         System.out.println(result.toString());
     }
 }

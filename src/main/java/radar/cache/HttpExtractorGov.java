@@ -1,11 +1,10 @@
-package radar.polishGovApi;
+package radar.cache;
 
-import radar.cache.HttpConnectionFactory;
-import radar.cache.HttpConnection;
-import radar.HttpExtractor;
-
-//to extract input stream from http site, (to send http get)
-public class PolishHttpExtractor implements HttpExtractor {
+/**
+ * Class implementing {@link HttpExtractor} interface, which methods
+ * work typically with Polish Gov API.
+ */
+public class HttpExtractorGov implements HttpExtractor {
     private static final String STATIONS_URL = "http://api.gios.gov.pl/pjp-api/rest/station/findAll";
     private static final String SENSORS_URL_TEMPLATE = "http://api.gios.gov.pl/pjp-api/rest/station/sensors/%s";
     private static final String DATA_URL_TEMPLATE = "http://api.gios.gov.pl/pjp-api/rest/data/getData/%s";
@@ -36,11 +35,11 @@ public class PolishHttpExtractor implements HttpExtractor {
         return connectAndExtract(requestURL);
     }
 
-    private String connectAndExtract(String requestURL) {
+    @Override
+    public String connectAndExtract(String requestURL) {
         //try-with-resources
         try (HttpConnection connection = httpConnectionFactory.build(requestURL)) {
-            String response = connection.getResponseAsString();
-            return response;
+            return connection.getResponseAsString();
         }
     }
 

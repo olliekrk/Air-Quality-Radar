@@ -6,8 +6,6 @@ import data.AirQualityIndex;
 import data.MeasurementData;
 import data.Sensor;
 import data.Station;
-import radar.HttpExtractor;
-import radar.RadarTranslator;
 
 import java.io.*;
 import java.time.Duration;
@@ -19,8 +17,7 @@ import java.util.Map;
 
 class CacheManager {
 
-    //in hours
-    private final static long updateFrequency = 2;
+    private final static long UPDATE_FREQUENCY_HOURS = 2;
     private String cacheFile;
 
     CacheManager(String cacheFile) {
@@ -38,6 +35,7 @@ class CacheManager {
             System.out.println("A cache file will be created now. Please be patient.");
             cache = refreshCache(extractor, translator);
             saveCache(cache);
+            System.out.println("Cache file created successfully.");
             return cache;
         } catch (IOException e) {
             System.out.println("Failed to load cache from file!");
@@ -51,7 +49,10 @@ class CacheManager {
                 System.out.println("Update has started. Please be patient.");
                 cache = refreshCache(extractor, translator);
                 saveCache(cache);
+                System.out.println("Cache update finished successfully.");
             }
+        } else {
+            System.out.println("Cache is up-to-date. No update is required.");
         }
         return cache;
     }
@@ -116,7 +117,7 @@ class CacheManager {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime then = cache.getUpdateDate();
         long diff = Math.abs(Duration.between(then, now).toHours());
-        return diff > updateFrequency;
+        return diff >= UPDATE_FREQUENCY_HOURS;
     }
 }
 

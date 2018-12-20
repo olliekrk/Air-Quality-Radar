@@ -3,9 +3,9 @@ package radar.polishGovApi;
 import data.MeasurementData;
 import data.Sensor;
 import data.Station;
-import radar.HttpExtractor;
+import radar.cache.HttpExtractor;
 import radar.RadarAdapter;
-import radar.RadarTranslator;
+import radar.cache.RadarTranslator;
 
 import java.io.IOException;
 
