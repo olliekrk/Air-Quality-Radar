@@ -1,4 +1,4 @@
-package radar.cache;
+package radar;
 
 public class MissingDataException extends Exception {
     public MissingDataException(String message) {

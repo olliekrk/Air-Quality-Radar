@@ -1,4 +1,4 @@
-package radar.cache;
+package radar;
 
 /**
  * Interface used to extract JSON data from HTTP REST service.

@@ -1,4 +1,4 @@
-package radar.cache;
+package radar;
 
 /**
  * Class implementing {@link HttpExtractor} interface, which methods

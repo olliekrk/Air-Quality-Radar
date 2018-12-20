@@ -1,4 +1,4 @@
-package radar.cache;
+package radar;
 
 public class CacheUser {
 
@@ -33,6 +33,10 @@ public class CacheUser {
 
     public Cache getCache() {
         return cache;
+    }
+
+    public CacheRadar getRadar() {
+        return radar;
     }
 }
 

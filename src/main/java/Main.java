@@ -1,47 +1,52 @@
-import radar.AirQualityRadar;
-import radar.cache.CacheRadar;
-import radar.cache.CacheRadarGov;
-import radar.cache.CacheUser;
-import radar.cache.MissingDataException;
-import radar.polishGovApi.PolishRadar;
+import radar.CacheRadar;
+import radar.CacheRadarGov;
+import radar.CacheUser;
+import radar.MissingDataException;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Main {
 
-    public static void noCacheTest() {
-        String todayDate = "2018-12-19";
-        String example1Date = todayDate + " 01:00:00";
-        String example2Date = todayDate + " 08:00:00";
-        AirQualityRadar radar = new PolishRadar();
-
-//        1
-        radar.getAirQualityIndexForStation("Kraków, Aleja Krasińskiego");
-//        2
-        radar.getCurrentParamValueForStation("Kraków, Aleja Krasińskiego", "pm10");
-//        3
-        radar.getAverageParamValueForPeriod("Kraków, Aleja Krasińskiego", "pm10", example1Date, example2Date);
-//        4
-        radar.getParamWithMaxAmplitudeForPeriod("Kraków, Aleja Krasińskiego", example1Date);
-//        5
-        radar.getParamWithMinValueForDay("Kraków, Aleja Krasińskiego", todayDate);
-//        6
-        radar.getNStationsWithMaxParamValueForDay(4, "so2", todayDate);
-//        7
-        radar.getParamExtremeMeasurementValues("so2");
-
-    }
-
     public static void cachedTest() {
-        CacheRadar radar = new CacheRadarGov();
-        CacheUser cacheUser = new CacheUser(radar);
+        CacheUser cacheUser = new CacheUser(new CacheRadarGov());
+        CacheRadar radar = cacheUser.getRadar();
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime now = LocalDateTime.now();
+        String nowDate = dtf.format(now);
+
+        String date1 = nowDate + " 01:00:00";
+        String date2 = nowDate + " 13:20:00";
+
+        String stationName = "Działoszyn";
+        String param = "PM10";
+
         try {
-            radar.getAirQualityIndexForStation("Działoszyn");
+            radar.getAirQualityIndexForStation(stationName);
+            radar.getAverageParamValuePeriod(stationName, param, date1, date2);
+            radar.getCurrentParamValueForStation(stationName, param);
+            radar.getExtremeParamValuePeriod(stationName, date1, date2);
+            radar.getParamOfMinimalValue(stationName, nowDate);
+            radar.getExtremeParamValueWhereAndWhen(param);
+            radar.getNSensorsWithMaximumParamValue(stationName, date1, param, 3);
+
         } catch (MissingDataException e) {
-            System.out.println("kupa");
+            System.out.println(e.getMessage());
         }
     }
 
     public static void main(String[] args) {
         cachedTest();
     }
+    /*
+    TODO: 1. wykres
+    TODO: 2. uruchamianie z IO
+    TODO: 3. jar
+    TODO: 4. testy - Mockito
+    TODO: 5. wzorzec projektowy
+    TODO: 6. serializacja?
+    TODO: opisy funkcjonalności się zmieniają, sprawdzać
+     */
 }
 

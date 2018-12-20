@@ -1,11 +1,8 @@
-package radar.cache;
+package radar;
 
 import data.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class CacheRadar {
@@ -30,7 +27,7 @@ public abstract class CacheRadar {
         Sensor sensor = seeker.findStationSensorParam(station.getId(), ParamType.getParam(paramName));
         MeasurementData data = seeker.findData(sensor.getId());
         MeasurementValue value = DataAnalyzer.getLatestMeasurementValue(data);
-        printer.printCurrentMeasurement(station.getStationName(), sensor.getParam().getParamName(), value);
+        printer.printCurrentMeasurement(station, sensor, value);
     }
 
     //3
@@ -39,7 +36,7 @@ public abstract class CacheRadar {
         Sensor sensor = seeker.findStationSensorParam(station.getId(), ParamType.getParam(paramName));
         MeasurementData data = seeker.findData(sensor.getId());
         double averageValue = DataAnalyzer.getAverageMeasurementValue(data, fromDate, toDate);
-        printer.printAverageMeasurement(station.getStationName(), sensor.getParam().getParamName(), fromDate, toDate, averageValue);
+        printer.printAverageMeasurement(station, sensor, fromDate, toDate, averageValue);
     }
 
     //4
@@ -132,9 +129,9 @@ public abstract class CacheRadar {
 
         Sensor[] sortedSensors = new Sensor[sortedTmp.length];
         MeasurementValue[] sortedValues = new MeasurementValue[sortedTmp.length];
-        for(int i = 0; i<sortedTmp.length;i++){
-            sortedSensors[i]=sortedTmp[i].sensor;
-            sortedValues[i]=sortedTmp[i].value;
+        for (int i = 0; i < sortedTmp.length; i++) {
+            sortedSensors[i] = sortedTmp[i].sensor;
+            sortedValues[i] = sortedTmp[i].value;
         }
         printer.printNSensors(station, sortedSensors, sortedValues, dateHour, paramCode, n);
     }
@@ -144,9 +141,9 @@ public abstract class CacheRadar {
         Station minStation = null, maxStation = null;
         Sensor minSensor = null, maxSensor = null;
         MeasurementValue minValue = null, maxValue = null;
-        List<Station> allStations = (List<Station>) seeker.getCache().getAllStations().values();
+        Map<String, Station> allStationsMap = seeker.getCache().getAllStations();
 
-        for (Station station : allStations) {
+        for (Station station : allStationsMap.values()) {
             List<Sensor> sensors = seeker.findStationSensors(station.getId());
             for (Sensor sensor : sensors) {
                 if (sensor.getParam().getParamCode().equals(paramName)) {
@@ -169,11 +166,11 @@ public abstract class CacheRadar {
         printer.printExtremeParamValuesWhereAndWhen(paramName, minStation, minSensor, minValue, maxStation, maxSensor, maxValue);
     }
 
-    public HttpExtractor getExtractor() {
+    HttpExtractor getExtractor() {
         return extractor;
     }
 
-    public RadarTranslator getTranslator() {
+    RadarTranslator getTranslator() {
         return translator;
     }
 }

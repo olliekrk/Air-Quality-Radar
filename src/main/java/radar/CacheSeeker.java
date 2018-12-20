@@ -1,4 +1,4 @@
-package radar.cache;
+package radar;
 
 import data.*;
 
@@ -22,7 +22,7 @@ public class CacheSeeker {
             if (sensor.getParam().getParamFormula().equals(param.getParamFormula()))
                 return sensor;
         }
-        throw new MissingDataException("Failed to find sensor of " + param.getParamFormula() + "on station with id: " + stationId);
+        throw new MissingDataException("Failed to find sensor of " + param.getParamFormula() + " on station with id: " + stationId);
     }
 
     public Station findStation(String stationName) throws MissingDataException {
