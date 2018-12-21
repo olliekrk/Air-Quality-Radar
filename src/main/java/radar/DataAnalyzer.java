@@ -3,87 +3,107 @@ package radar;
 import data.MeasurementData;
 import data.MeasurementValue;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
-class DataAnalyzer {
+public class DataAnalyzer {
 
-    static MeasurementValue getLatestMeasurementValue(MeasurementData data) {
-        MeasurementValue latest = null;
-        for (MeasurementValue value : data.getValues()) {
-            if (value.getValue() != null && ((latest == null) || (compareDates(latest.getDate(), value.getDate()) < 0))) {
-                latest = value;
-            }
-        }
-        return latest;
+    static final String dateTimePattern = "yyyy-MM-dd HH:mm:ss";
+
+    public enum DateCheckType {
+        IN,
+        BETWEEN,
+        SINCE,
+        ANY
+
     }
 
-    static double getAverageMeasurementValue(MeasurementData data, String fromDate, String toDate) {
-        int count = 0;
-        double sum = 0;
-        for (MeasurementValue value : data.getValues()) {
-            if (value.getValue() != null) {
-                String date = value.getDate();
-                if (compareDates(fromDate, date) <= 0 && compareDates(date, toDate) <= 0) {
-                    count++;
-                    sum += value.getValue();
-                }
-            }
-        }
-        if (count == 0) return -1;
-        return sum / count;
+    public enum ResultType {
+        DEFAULT,
+        AVERAGE,
+        MIN,
+        MAX
+
     }
 
-    private static int compareDates(String date1, String date2) {
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date d1 = null;
-        Date d2 = null;
-        try {
-            d1 = format.parse(date1);
-            d2 = format.parse(date2);
-        } catch (ParseException e) {
-            //unlikely to happen
-        }
-        return d1.compareTo(d2);
-        //-1 if d1 is earlier than d2
-    }
+    static MeasurementValue getValue(MeasurementData data, LocalDateTime date1, LocalDateTime date2, DateCheckType dateCheckType, ResultType resultType) throws MissingDataException {
+        if (data == null || data.getValues() == null || data.getValues().size() == 0)
+            throw new MissingDataException("Failed to analyze measurement data!");
 
-    static MeasurementValue getExtremeMeasurementValue(MeasurementData data, String fromDate, String toDate, String type) {
-        if (data == null) return null;
-        MeasurementValue extreme = null;
-        for (MeasurementValue value : data.getValues()) {
-            if (value != null && value.getValue() != null) {
-                boolean OK = false;
-                //beetween two dates
-                if (fromDate != null && toDate != null) {
-                    if ((compareDates(fromDate, value.getDate()) <= 0 && compareDates(value.getDate(), toDate) <= 0))
-                        OK = true;
-                }
-                //from one date
-                else if (fromDate != null) {
-                    if ((compareDates(fromDate, value.getDate()) <= 0))
-                        OK = true;
-                }
-                //no date constraints
-                else {
-                    OK = true;
-                }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimePattern);
 
-                if (OK) {
-                    if ("min".equals(type)) {
-                        if (extreme == null || extreme.getValue() > value.getValue()) {
-                            extreme = value;
-                        }
-                    } else if ("max".equals(type)) {
-                        if (extreme == null || extreme.getValue() < value.getValue()) {
-                            extreme = value;
-                        }
+        List<MeasurementValue> checkedDateValues = data.getValues().stream()
+                .filter(x -> x.getValue() != null && x.getDate() != null)
+                .filter(x -> {
+                    LocalDateTime xDateTime = LocalDateTime.parse(x.getDate(), formatter);
+                    switch (dateCheckType) {
+                        case IN:
+                            if (xDateTime.isEqual(date1))
+                                return true;
+                            break;
+                        case SINCE:
+                            if (xDateTime.isEqual(date1) || xDateTime.isAfter(date1))
+                                return true;
+                            break;
+                        case BETWEEN:
+                            if ((xDateTime.isEqual(date1) || xDateTime.isAfter(date1)) && (xDateTime.isEqual(date2) || xDateTime.isBefore(date2)))
+                                return true;
+                            break;
+                        case ANY:
+                            return true;
                     }
+                    return false;
+                }).collect(Collectors.toList());
+
+        if (checkedDateValues.size() == 0)
+            throw new MissingDataException("Failed to find measurement value for given sensor, date(s) and time!");
+
+        switch (resultType) {
+            case DEFAULT:
+                //list now should contain 1 value
+                return checkedDateValues.get(0);
+
+            case AVERAGE:
+                int count = checkedDateValues.size();
+                double total = 0;
+                for (MeasurementValue value : checkedDateValues) {
+                    total += value.getValue();
                 }
-            }
+                MeasurementValue resultValue = new MeasurementValue();
+                resultValue.setDate(null);
+                resultValue.setValue(total / count);
+                return resultValue;
+
+            case MAX:
+                MeasurementValue maxValue = null;
+                for (MeasurementValue value : checkedDateValues) {
+                    if (maxValue == null || value.getValue() > maxValue.getValue())
+                        maxValue = value;
+                }
+                return maxValue;
+
+            case MIN:
+                MeasurementValue minValue = null;
+                for (MeasurementValue value : checkedDateValues) {
+                    if (minValue == null || value.getValue() < minValue.getValue())
+                        minValue = value;
+                }
+                return minValue;
         }
-        return extreme;
+
+        throw new MissingDataException("Failed to analyze measurement data!");
     }
+
+    public static LocalDateTime intoDateTime(String dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimePattern);
+        return LocalDateTime.parse(dateTime, formatter);
+    }
+
+    public static String fromDateTime(LocalDateTime dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimePattern);
+        return dateTime.format(formatter);
+    }
+
 }

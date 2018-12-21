@@ -2,9 +2,6 @@ package radar;
 
 public class CacheUser {
 
-    //TODO:można pododwać flagi żeby nie aktualizować za każdym razem całego cache'a
-    // tylko aktualizować to czego chce klient (wiemy po parametrach wywolania programu)
-
     private static boolean updatesAllowed = true;
     private final static String cachePath = "radarCache.json";
 
@@ -29,10 +26,6 @@ public class CacheUser {
 
     public static void setUpdatesAllowed(boolean updatesAllowed) {
         CacheUser.updatesAllowed = updatesAllowed;
-    }
-
-    public Cache getCache() {
-        return cache;
     }
 
     public CacheRadar getRadar() {

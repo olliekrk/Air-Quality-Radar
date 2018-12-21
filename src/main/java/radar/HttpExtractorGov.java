@@ -19,8 +19,7 @@ public class HttpExtractorGov implements HttpExtractor {
 
     @Override
     public String extractAllStationsData() {
-        String requestURL = STATIONS_URL;
-        return connectAndExtract(requestURL);
+        return connectAndExtract(STATIONS_URL);
     }
 
     @Override

@@ -19,7 +19,7 @@ public class CacheSeeker {
     public Sensor findStationSensorParam(Integer stationId, ParamType param) throws MissingDataException {
         List<Sensor> stationSensors = findStationSensors(stationId);
         for (Sensor sensor : stationSensors) {
-            if (sensor.getParam().getParamFormula().equals(param.getParamFormula()))
+            if (sensor.getParam().getParamFormula().compareToIgnoreCase(param.getParamFormula()) == 0)
                 return sensor;
         }
         throw new MissingDataException("Failed to find sensor of " + param.getParamFormula() + " on station with id: " + stationId);

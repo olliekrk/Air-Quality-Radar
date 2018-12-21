@@ -1,5 +1,7 @@
 package data;
 
+import radar.UnknownParameterException;
+
 import java.util.Arrays;
 
 public enum ParamType {
@@ -16,12 +18,16 @@ public enum ParamType {
         this.paramFormula = paramFormula;
     }
 
-    public static ParamType getParam(String paramName) {
-        return ParamType.valueOf(paramName.toUpperCase());
-    }
-
     public String getParamFormula() {
         return paramFormula;
+    }
+
+    public static ParamType getParamType(String paramCode) throws UnknownParameterException {
+        for (ParamType param : ParamType.values()) {
+            if (param.name().compareToIgnoreCase(paramCode) == 0)
+                return param;
+        }
+        throw new UnknownParameterException("Unknown parameter: " + paramCode + "!");
     }
 
     public static String[] getAllParamCodes() {

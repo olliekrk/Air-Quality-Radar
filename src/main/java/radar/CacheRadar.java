@@ -2,98 +2,104 @@ package radar;
 
 import data.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class CacheRadar {
 
-    //todo: this
-    //initialize!
     protected HttpExtractor extractor;
     protected RadarPrinter printer;
     protected RadarTranslator translator;
     protected CacheSeeker seeker;
 
-    //1
+    //1. Wypisanie aktualnego indeksu jakości powietrza dla podanej (nazwy) stacji pomiarowej
     public void getAirQualityIndexForStation(String stationName) throws MissingDataException {
         Station station = seeker.findStation(stationName);
         AirQualityIndex index = seeker.findIndex(station.getId());
         printer.printIndexData(station, index);
     }
 
-    //2
-    public void getCurrentParamValueForStation(String stationName, String paramName) throws MissingDataException {
+    //2. Wypisanie dla podanego dnia, godziny oraz stacji pomiarowej (czytelna nazwa stacji) aktualnej wartości danego parametru (np. PM10)
+    public void getParamValueForStation(String stationName, String paramCode, LocalDateTime date) throws MissingDataException, UnknownParameterException {
         Station station = seeker.findStation(stationName);
-        Sensor sensor = seeker.findStationSensorParam(station.getId(), ParamType.getParam(paramName));
+        ParamType paramType = ParamType.getParamType(paramCode);
+        Sensor sensor = seeker.findStationSensorParam(station.getId(), paramType);
         MeasurementData data = seeker.findData(sensor.getId());
-        MeasurementValue value = DataAnalyzer.getLatestMeasurementValue(data);
-        printer.printCurrentMeasurement(station, sensor, value);
+
+        MeasurementValue resultValue = DataAnalyzer.getValue(data, date, null, DataAnalyzer.DateCheckType.IN, DataAnalyzer.ResultType.DEFAULT);
+        printer.printMeasurement(station, sensor, resultValue);
     }
 
-    //3
-    public void getAverageParamValuePeriod(String stationName, String paramName, String fromDate, String toDate) throws MissingDataException {
+    //3. Obliczenie średniej wartości zanieczyszczenia / parametru (np. SO2) za podany okres dla danej stacji
+    public void getAverageParamValuePeriod(String stationName, String paramCode, LocalDateTime since, LocalDateTime until) throws MissingDataException, UnknownParameterException {
         Station station = seeker.findStation(stationName);
-        Sensor sensor = seeker.findStationSensorParam(station.getId(), ParamType.getParam(paramName));
+        ParamType paramType = ParamType.getParamType(paramCode);
+        Sensor sensor = seeker.findStationSensorParam(station.getId(), paramType);
         MeasurementData data = seeker.findData(sensor.getId());
-        double averageValue = DataAnalyzer.getAverageMeasurementValue(data, fromDate, toDate);
-        printer.printAverageMeasurement(station, sensor, fromDate, toDate, averageValue);
+
+        MeasurementValue resultValue = DataAnalyzer.getValue(data, since, until, DataAnalyzer.DateCheckType.BETWEEN, DataAnalyzer.ResultType.AVERAGE);
+        printer.printAverageMeasurement(station, sensor, since, until, resultValue.getValue());
     }
 
-    //4
-    public void getExtremeParamValuePeriod(String stationName, String fromDate, String toDate) throws MissingDataException {
+    //4. Odszukanie, dla wymienionych stacji, parametru którego wartość, począwszy od podanej godziny (danego dnia), uległa największym wahaniom
+    public void getExtremeParamValuePeriod(String stationName, LocalDateTime since) throws MissingDataException {
         Station station = seeker.findStation(stationName);
         List<Sensor> sensors = seeker.findStationSensors(station.getId());
         MeasurementValue currentMin = null;
         MeasurementValue currentMax = null;
         Sensor currentSensor = null;
-        double currentAmplitude = -1;
+        Double currentAmplitude = (double) -1;
         for (Sensor sensor : sensors) {
             MeasurementData data = seeker.findData(sensor.getId());
-            MeasurementValue min = DataAnalyzer.getExtremeMeasurementValue(data, fromDate, toDate, "min");
-            MeasurementValue max = DataAnalyzer.getExtremeMeasurementValue(data, fromDate, toDate, "max");
-            double amplitude = max.getValue() - min.getValue();
+
+            MeasurementValue maybeMin = DataAnalyzer.getValue(data, since, null, DataAnalyzer.DateCheckType.SINCE, DataAnalyzer.ResultType.MIN);
+            MeasurementValue maybeMax = DataAnalyzer.getValue(data, since, null, DataAnalyzer.DateCheckType.SINCE, DataAnalyzer.ResultType.MAX);
+            Double amplitude = maybeMax.getValue() - maybeMin.getValue();
+
             if (amplitude > currentAmplitude) {
                 currentSensor = sensor;
-                currentMin = min;
-                currentMax = max;
+                currentMin = maybeMin;
+                currentMax = maybeMax;
                 currentAmplitude = amplitude;
             }
         }
-        printer.printExtremeParamValuesPeriod(station, fromDate, toDate, currentSensor, currentMin, currentMax);
+        printer.printExtremeParamValuesSince(station, since, currentSensor, currentMin, currentMax);
     }
 
-    //5 (o podanej godzinie podanego dnia?) zrobiłem dla podanego dnia
-    public void getParamOfMinimalValue(String stationName, String date) throws MissingDataException {
+    //5. Odszukanie parametru, którego wartość była najmniejsza o podanej godzinie podanego dnia
+    public void getParamOfMinimalValue(String stationName, LocalDateTime date) throws MissingDataException {
         Station station = seeker.findStation(stationName);
         List<Sensor> sensors = seeker.findStationSensors(station.getId());
-        MeasurementValue currentMin = null;
-        Sensor currentSensor = null;
+        MeasurementValue minValue = null;
+        Sensor minSensor = null;
         for (Sensor sensor : sensors) {
             MeasurementData data = seeker.findData(sensor.getId());
-            MeasurementValue min = DataAnalyzer.getExtremeMeasurementValue(data, date + " 0:00:00", date + " 23:59:00", "min");
-            if (min != null && min.getValue() != null && (currentMin == null || currentMin.getValue() > min.getValue())) {
-                currentMin = min;
-                currentSensor = sensor;
+            MeasurementValue maybeMin = DataAnalyzer.getValue(data, date, null, DataAnalyzer.DateCheckType.IN, DataAnalyzer.ResultType.MIN);
+            if (maybeMin != null && maybeMin.getValue() != null && (minValue == null || minValue.getValue() > maybeMin.getValue())) {
+                minValue = maybeMin;
+                minSensor = sensor;
             }
         }
-        printer.printParamMinimalValue(station, currentSensor, currentMin, date);
+        printer.printParamMinimalValue(station, minSensor, minValue, date);
     }
 
-    //6
-    //    Dla podanej stacji, wypisanie N stanowisk pomiarowych, posortowanych (rosnąco), które o podanej godzinie określonego dnia, zanotowały największą wartość podanego parametru
-    public void getNSensorsWithMaximumParamValue(String stationName, String dateHour, String paramCode, int n) throws MissingDataException {
+    //6. Dla podanej stacji, wypisanie N stanowisk pomiarowych, posortowanych (rosnąco), które o podanej godzinie określonego dnia, zanotowały największą wartość podanego parametru
+    public void getNSensorsWithMaximumParamValue(String stationName, String paramCode, LocalDateTime date, int n) throws MissingDataException, UnknownParameterException {
         Station station = seeker.findStation(stationName);
+        ParamType paramType = ParamType.getParamType(paramCode);
+
         List<Sensor> sensors = seeker
                 .findStationSensors(station.getId())
                 .stream()
-                .filter(x -> x.getParam().getParamCode().compareToIgnoreCase(paramCode) == 0)
+                .filter(x -> x.getParam().getParamFormula().equals(paramType.getParamFormula()))
                 .collect(Collectors.toList());
 
         class TmpClass implements Comparable {
-            Sensor sensor;
-            MeasurementValue value;
+            private Sensor sensor;
+            private MeasurementValue value;
 
-            public TmpClass(Sensor sensor, MeasurementValue value) {
+            private TmpClass(Sensor sensor, MeasurementValue value) {
                 this.sensor = sensor;
                 this.value = value;
             }
@@ -111,8 +117,8 @@ public abstract class CacheRadar {
         List<TmpClass> tmpClassList = new ArrayList<>();
 
         for (Sensor sensor : sensors) {
-            MeasurementData measurementData = seeker.findData(sensor.getId());
-            MeasurementValue maxValue = DataAnalyzer.getExtremeMeasurementValue(measurementData, dateHour, dateHour, "max");
+            MeasurementData data = seeker.findData(sensor.getId());
+            MeasurementValue maxValue = DataAnalyzer.getValue(data, date, null, DataAnalyzer.DateCheckType.IN, DataAnalyzer.ResultType.MAX);
             tmpClassList.add(new TmpClass(sensor, maxValue));
         }
 
@@ -133,10 +139,10 @@ public abstract class CacheRadar {
             sortedSensors[i] = sortedTmp[i].sensor;
             sortedValues[i] = sortedTmp[i].value;
         }
-        printer.printNSensors(station, sortedSensors, sortedValues, dateHour, paramCode, n);
+        printer.printNSensors(station, sortedSensors, sortedValues, date, paramCode, n);
     }
 
-    //7
+    //7. Dla podanego parametru wypisanie informacji: kiedy (dzień, godzina) i gdzie (stacja), miał on największą wartość, a kiedy i gdzie najmniejszą
     public void getExtremeParamValueWhereAndWhen(String paramName) throws MissingDataException {
         Station minStation = null, maxStation = null;
         Sensor minSensor = null, maxSensor = null;
@@ -148,16 +154,16 @@ public abstract class CacheRadar {
             for (Sensor sensor : sensors) {
                 if (sensor.getParam().getParamCode().equals(paramName)) {
                     MeasurementData data = seeker.findData(sensor.getId());
-                    MeasurementValue min = DataAnalyzer.getExtremeMeasurementValue(data, null, null, "min");
-                    MeasurementValue max = DataAnalyzer.getExtremeMeasurementValue(data, null, null, "max");
-                    if (min != null && (minValue == null || minValue.getValue() > min.getValue())) {
+                    MeasurementValue maybeMin = DataAnalyzer.getValue(data, null, null, DataAnalyzer.DateCheckType.ANY, DataAnalyzer.ResultType.MIN);
+                    MeasurementValue maybeMax = DataAnalyzer.getValue(data, null, null, DataAnalyzer.DateCheckType.ANY, DataAnalyzer.ResultType.MAX);
+                    if (maybeMin != null && (minValue == null || minValue.getValue() > maybeMin.getValue())) {
                         minSensor = sensor;
-                        minValue = min;
+                        minValue = maybeMin;
                         minStation = station;
                     }
-                    if (max != null && (maxValue == null || maxValue.getValue() < max.getValue())) {
+                    if (maybeMax != null && (maxValue == null || maxValue.getValue() < maybeMax.getValue())) {
                         maxSensor = sensor;
-                        maxValue = max;
+                        maxValue = maybeMax;
                         maxStation = station;
                     }
                 }
@@ -166,11 +172,84 @@ public abstract class CacheRadar {
         printer.printExtremeParamValuesWhereAndWhen(paramName, minStation, minSensor, minValue, maxStation, maxSensor, maxValue);
     }
 
-    HttpExtractor getExtractor() {
+    //todo graph
+    //8. Rysowanie (w trybie tekstowym) wspólnego (dla wszystkich podanych godzin) wykresu zmian wartości
+    // (np. wykres słupkowy, za pomocą różnorodnych znaków ASCII) podanego parametru w układzie godzinowym, tzn. jaka było zanieczyszczenie (np. SO2)
+    //Dla punktu 8, jako dane wejściowe programu podajemy: nazwę parametru, nazwy stacji pomiarowych oraz dwa czasy: godzinę początkową oraz końcową
+    public void drawGraph(String[] stationNames, String paramCode, LocalDateTime since, LocalDateTime until) throws UnknownParameterException, MissingDataException {
+        ParamType paramType = ParamType.getParamType(paramCode);
+
+        List<Station> stations = new ArrayList<>();
+        for (String name : stationNames) {
+            try {
+                Station station = seeker.findStation(name);
+                stations.add(station);
+            } catch (MissingDataException e) {
+                System.out.println(e.getMessage());
+                //and do not add to list
+            }
+        }
+        //key is stationId
+        Map<Integer, Sensor> sensors = new HashMap<>();
+        for (Station station : stations) {
+            try {
+                Sensor sensor = seeker.findStationSensorParam(station.getId(), paramType);
+                sensors.put(station.getId(), sensor);
+            } catch (MissingDataException e) {
+                System.out.println(e.getMessage());
+                //and do not add
+            }
+        }
+        //key is sensorId
+        Map<Integer, MeasurementData> dataMap = new HashMap<>();
+        for (Sensor sensor : sensors.values()) {
+            try {
+                MeasurementData data = seeker.findData(sensor.getId());
+                dataMap.put(sensor.getId(), data);
+            } catch (MissingDataException e) {
+                System.out.println(e.getMessage());
+                //and do not add
+            }
+        }
+
+        MeasurementValue maxValue = null;
+        MeasurementValue minValue = null;
+
+        //finding min and max measured values
+        for (Station station : stations) {
+            Sensor sensor = sensors.get(station.getId());
+            MeasurementData data = dataMap.get(sensor.getId());
+            try {
+                MeasurementValue maybeMax = DataAnalyzer.getValue(data, since, until, DataAnalyzer.DateCheckType.BETWEEN, DataAnalyzer.ResultType.MAX);
+                MeasurementValue maybeMin = DataAnalyzer.getValue(data, since, until, DataAnalyzer.DateCheckType.BETWEEN, DataAnalyzer.ResultType.MIN);
+                if (maxValue == null || maxValue.getValue() < maybeMax.getValue()) {
+                    maxValue = maybeMax;
+                }
+                if (minValue == null || minValue.getValue() > maybeMin.getValue()) {
+                    minValue = maybeMin;
+                }
+            } catch (MissingDataException e) {
+                //just do not compare
+            }
+        }
+        if (maxValue == null || minValue == null)
+            throw new MissingDataException("No sufficient data is available to draw a graph.");
+
+        double range = maxValue.getValue() - minValue.getValue();
+
+        //drawing graph
+        for (Station station : stations) {
+            Sensor sensor = sensors.get(station.getId());
+            MeasurementData data = dataMap.get(sensor.getId());
+            printer.printGraph(station, sensor, data, since, until, paramType, range);
+        }
+    }
+
+    public HttpExtractor getExtractor() {
         return extractor;
     }
 
-    RadarTranslator getTranslator() {
+    public RadarTranslator getTranslator() {
         return translator;
     }
 }
