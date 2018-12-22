@@ -49,6 +49,7 @@ public class RadarPrinterGov implements RadarPrinter {
                 bigSeparator +
                 String.format(stationFormat, station.getStationName(), station.getId()) +
                 String.format(sensorFormat, sensor.getParam().getParamName(), sensor.getId()) +
+                separator +
                 "Measurement: \n" +
                 String.format(defaultMeasurementInfoFormat, latestMeasurement.getDate(), latestMeasurement.getValue()) +
                 separator;
@@ -126,7 +127,8 @@ public class RadarPrinterGov implements RadarPrinter {
         StringBuilder result = new StringBuilder();
         result
                 .append(bigSeparator)
-                .append(n + " sensors with maximum parameter value for given day info. \n")
+                .append(n)
+                .append(" sensors with maximum parameter value for given day info. \n")
                 .append(bigSeparator)
                 .append(String.format(stationFormat, station.getStationName(), station.getId()))
                 .append(String.format(oneDateFormat, fromDateTime(date)))
@@ -134,7 +136,9 @@ public class RadarPrinterGov implements RadarPrinter {
 
         for (int i = 0; i < sortedSensors.length; i++) {
             result
-                    .append("Top " + (sortedSensors.length - i) + ": \n")
+                    .append("Top ")
+                    .append(sortedSensors.length - i)
+                    .append(": \n")
                     .append(String.format(sensorFormat, sortedSensors[i].getParam().getParamName(), sortedSensors[i].getId()))
                     .append(String.format(defaultMeasurementInfoFormat, sortedValues[i].getDate(), sortedValues[i].getValue()))
                     .append(separator);

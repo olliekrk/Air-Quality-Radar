@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 
 public abstract class CacheRadar {
 
-    protected HttpExtractor extractor;
-    protected RadarPrinter printer;
-    protected RadarTranslator translator;
-    protected CacheSeeker seeker;
+    HttpExtractor extractor;
+    RadarPrinter printer;
+    RadarTranslator translator;
+    CacheSeeker seeker;
 
     //1. Wypisanie aktualnego indeksu jakości powietrza dla podanej (nazwy) stacji pomiarowej
     public void getAirQualityIndexForStation(String stationName) throws MissingDataException {
@@ -143,36 +143,36 @@ public abstract class CacheRadar {
     }
 
     //7. Dla podanego parametru wypisanie informacji: kiedy (dzień, godzina) i gdzie (stacja), miał on największą wartość, a kiedy i gdzie najmniejszą
-    public void getExtremeParamValueWhereAndWhen(String paramName) throws MissingDataException {
+    public void getExtremeParamValueWhereAndWhen(String paramCode) throws UnknownParameterException {
         Station minStation = null, maxStation = null;
         Sensor minSensor = null, maxSensor = null;
         MeasurementValue minValue = null, maxValue = null;
         Map<String, Station> allStationsMap = seeker.getCache().getAllStations();
+        ParamType paramType = ParamType.getParamType(paramCode);
 
         for (Station station : allStationsMap.values()) {
-            List<Sensor> sensors = seeker.findStationSensors(station.getId());
-            for (Sensor sensor : sensors) {
-                if (sensor.getParam().getParamCode().equals(paramName)) {
-                    MeasurementData data = seeker.findData(sensor.getId());
-                    MeasurementValue maybeMin = DataAnalyzer.getValue(data, null, null, DataAnalyzer.DateCheckType.ANY, DataAnalyzer.ResultType.MIN);
-                    MeasurementValue maybeMax = DataAnalyzer.getValue(data, null, null, DataAnalyzer.DateCheckType.ANY, DataAnalyzer.ResultType.MAX);
-                    if (maybeMin != null && (minValue == null || minValue.getValue() > maybeMin.getValue())) {
-                        minSensor = sensor;
-                        minValue = maybeMin;
-                        minStation = station;
-                    }
-                    if (maybeMax != null && (maxValue == null || maxValue.getValue() < maybeMax.getValue())) {
-                        maxSensor = sensor;
-                        maxValue = maybeMax;
-                        maxStation = station;
-                    }
+            try {
+                Sensor sensor = seeker.findStationSensorParam(station.getId(), paramType);
+                MeasurementData data = seeker.findData(sensor.getId());
+                MeasurementValue maybeMin = DataAnalyzer.getValue(data, null, null, DataAnalyzer.DateCheckType.ANY, DataAnalyzer.ResultType.MIN);
+                MeasurementValue maybeMax = DataAnalyzer.getValue(data, null, null, DataAnalyzer.DateCheckType.ANY, DataAnalyzer.ResultType.MAX);
+                if (maybeMin != null && maybeMin.getValue() != null && (minValue == null || minValue.getValue() > maybeMin.getValue())) {
+                    minSensor = sensor;
+                    minValue = maybeMin;
+                    minStation = station;
                 }
+                if (maybeMax != null && maybeMax.getValue() != null && (maxValue == null || maxValue.getValue() < maybeMax.getValue())) {
+                    maxSensor = sensor;
+                    maxValue = maybeMax;
+                    maxStation = station;
+                }
+            } catch (MissingDataException e) {
+                //just continue searching
             }
         }
-        printer.printExtremeParamValuesWhereAndWhen(paramName, minStation, minSensor, minValue, maxStation, maxSensor, maxValue);
+        printer.printExtremeParamValuesWhereAndWhen(paramCode, minStation, minSensor, minValue, maxStation, maxSensor, maxValue);
     }
 
-    //todo graph
     //8. Rysowanie (w trybie tekstowym) wspólnego (dla wszystkich podanych godzin) wykresu zmian wartości
     // (np. wykres słupkowy, za pomocą różnorodnych znaków ASCII) podanego parametru w układzie godzinowym, tzn. jaka było zanieczyszczenie (np. SO2)
     //Dla punktu 8, jako dane wejściowe programu podajemy: nazwę parametru, nazwy stacji pomiarowych oraz dwa czasy: godzinę początkową oraz końcową
@@ -235,7 +235,7 @@ public abstract class CacheRadar {
         if (maxValue == null || minValue == null)
             throw new MissingDataException("No sufficient data is available to draw a graph.");
 
-        double range = maxValue.getValue() - minValue.getValue();
+        double range = maxValue.getValue();// - minValue.getValue();
 
         //drawing graph
         for (Station station : stations) {
@@ -245,11 +245,11 @@ public abstract class CacheRadar {
         }
     }
 
-    public HttpExtractor getExtractor() {
+    HttpExtractor getExtractor() {
         return extractor;
     }
 
-    public RadarTranslator getTranslator() {
+    RadarTranslator getTranslator() {
         return translator;
     }
 }

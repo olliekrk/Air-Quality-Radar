@@ -42,7 +42,7 @@ class CacheManager {
             System.out.println(e.getMessage());
             return null;
         }
-        System.out.println("Last update date: " + cache.getUpdateDate().toString());
+        System.out.println("Last update date: " + DataAnalyzer.fromDateTime(cache.getUpdateDate()));
         if (needsUpdate(cache)) {
             System.out.println("Cache is not up-to-date. An update is required.");
             if (updatesAllowed) {
