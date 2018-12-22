@@ -1,6 +1,11 @@
 package radar;
 
-import java.io.*;
+import radar.exceptions.HttpConnectionException;
+
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -16,16 +21,7 @@ public class HttpConnection implements Closeable {
         }
     }
 
-    public InputStream getResponseAsInputStream() {
-        responseCheck();
-        try {
-            return this.connection.getInputStream();
-        } catch (IOException e) {
-            throw new HttpConnectionException(e.getMessage());
-        }
-    }
-
-    void responseCheck() {
+    private void responseCheck() {
         try {
             int response = connection.getResponseCode();
             if (response != 200) {
@@ -35,11 +31,6 @@ public class HttpConnection implements Closeable {
         } catch (IOException e) {
             throw new HttpConnectionException(e.getMessage());
         }
-    }
-
-    @Override
-    public void close() {
-        connection.disconnect();
     }
 
     public String getResponseAsString() {
@@ -54,5 +45,10 @@ public class HttpConnection implements Closeable {
             throw new HttpConnectionException(e.getMessage());
         }
         return response.toString();
+    }
+
+    @Override
+    public void close() {
+        connection.disconnect();
     }
 }

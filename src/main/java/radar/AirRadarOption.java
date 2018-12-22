@@ -1,5 +1,12 @@
 package radar;
 
+import org.apache.commons.cli.CommandLine;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
 public enum AirRadarOption {
     AIR_QUALITY_INDEX(1, true, false, false, false, "Show air quality index for given station(s)."),
     MEASUREMENT_VALUE(2, true, true, true, false, "Show measurement value for given station(s), parameter and date."),
@@ -25,5 +32,56 @@ public enum AirRadarOption {
         this.sinceRequired = sinceRequired;
         this.untilRequired = untilRequired;
         this.description = description;
+    }
+
+    public static List<AirRadarOption> getAvailableOptions(CommandLine cmd) {
+        boolean stationArg = cmd.hasOption("stations");
+        boolean paramCodeArg = cmd.hasOption("parameter");
+        boolean dateSinceArg = cmd.hasOption("since");
+        boolean dateUntilArg = cmd.hasOption("until");
+
+        List<AirRadarOption> airRadarOptions = new ArrayList<>();
+        for (AirRadarOption option : AirRadarOption.values()) {
+            boolean available = true;
+            if (option.paramCodeRequired && !paramCodeArg) available = false;
+            if (option.stationNameRequired && !stationArg) available = false;
+            if (option.sinceRequired && !dateSinceArg) available = false;
+            if (option.untilRequired && !dateUntilArg) available = false;
+            if (available) airRadarOptions.add(option);
+        }
+        return airRadarOptions;
+    }
+
+    public static void printAvailableOptions(List<AirRadarOption> availableOptions, String[] stationNames, String paramCode, LocalDateTime sinceDate, LocalDateTime untilDate) {
+        System.out.println("List of all available options: ");
+        for (AirRadarOption option : availableOptions) {
+            System.out.println(option.optionNo + ": " + option.description);
+        }
+        System.out.print('\n');
+        if (stationNames != null) {
+            System.out.print("Stations: ");
+            for (String stationName : stationNames)
+                System.out.print(" (" + stationName + ") ");
+            System.out.println();
+        }
+        if (paramCode != null) System.out.println("Parameter: " + paramCode);
+        if (sinceDate != null) System.out.println("1st date (since/in): " + DataAnalyzer.fromDateTime(sinceDate));
+        if (untilDate != null) System.out.println("2nd date (until): " + DataAnalyzer.fromDateTime(untilDate));
+        System.out.println();
+
+    }
+
+    public static AirRadarOption getValidOption(List<AirRadarOption> availableOptions, Scanner in) {
+        while (true) {
+            System.out.print("Enter a number of option: ");
+            String input = in.next();
+            int optionNo = Integer.parseInt(input);
+            for (AirRadarOption availableOption : availableOptions) {
+                if (availableOption.optionNo == optionNo) {
+                    return availableOption;
+                }
+            }
+            System.out.println("Incorrect option number. Please try again.");
+        }
     }
 }

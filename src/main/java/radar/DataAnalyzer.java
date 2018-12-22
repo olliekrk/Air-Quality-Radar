@@ -2,15 +2,16 @@ package radar;
 
 import data.MeasurementData;
 import data.MeasurementValue;
+import radar.exceptions.MissingDataException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DataAnalyzer {
+public abstract class DataAnalyzer {
 
-    static final String dateTimePattern = "yyyy-MM-dd HH:mm:ss";
+    private static final String dateTimePattern = "yyyy-MM-dd HH:mm:ss";
 
     public enum DateCheckType {
         IN,
@@ -28,7 +29,7 @@ public class DataAnalyzer {
 
     }
 
-    static MeasurementValue getValue(MeasurementData data, LocalDateTime date1, LocalDateTime date2, DateCheckType dateCheckType, ResultType resultType) throws MissingDataException {
+    public static MeasurementValue getValue(MeasurementData data, LocalDateTime date1, LocalDateTime date2, DateCheckType dateCheckType, ResultType resultType) throws MissingDataException {
         if (data == null || data.getValues() == null || data.getValues().size() == 0)
             throw new MissingDataException("Failed to analyze measurement data!");
 
@@ -58,7 +59,7 @@ public class DataAnalyzer {
                 }).collect(Collectors.toList());
 
         if (checkedDateValues.size() == 0)
-            throw new MissingDataException("Failed to find measurement value for given sensor, date(s) and time!");
+            throw new MissingDataException("Failed to find measurement value for given sensor date(s) and time!");
 
         switch (resultType) {
             case DEFAULT:

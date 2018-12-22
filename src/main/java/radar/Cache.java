@@ -30,19 +30,19 @@ class Cache implements Serializable {
         return updateDate;
     }
 
-    public Map<String, Station> getAllStations() {
+    Map<String, Station> getAllStations() {
         return allStations;
     }
 
-    public Map<Integer, List<Sensor>> getAllSensors() {
+    Map<Integer, List<Sensor>> getAllSensors() {
         return allSensors;
     }
 
-    public Map<Integer, MeasurementData> getAllData() {
+    Map<Integer, MeasurementData> getAllData() {
         return allData;
     }
 
-    public Map<Integer, AirQualityIndex> getAllIndices() {
+    Map<Integer, AirQualityIndex> getAllIndices() {
         return allIndices;
     }
 }

@@ -15,49 +15,54 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class CacheManager {
+public class CacheLoader {
 
-    private final static long UPDATE_FREQUENCY_HOURS = 2;
-    private String cacheFile;
+    private static final long UPDATE_FREQUENCY_HOURS = 2;
+    private static final boolean UPDATES_ALLOWED = true;
+    private final String cachePath;
+    private Cache cache;
 
-    CacheManager(String cacheFile) {
-        this.cacheFile = cacheFile;
+    //for default cache file localization
+    public CacheLoader() {
+        this.cachePath = "radarCache.json";
     }
 
-    Cache loadCache(HttpExtractor extractor, RadarTranslator translator, boolean updatesAllowed) {
+    //for custom cache file localization
+    public CacheLoader(String cachePath) {
+        this.cachePath = cachePath;
+    }
 
-        Cache cache;
-        try (Reader reader = new FileReader(cacheFile)) {
+    public void loadCache(HttpExtractor extractor, RadarReader translator) {
+        try (Reader reader = new FileReader(cachePath)) {
             Gson gson = new GsonBuilder().create();
-            cache = gson.fromJson(reader, Cache.class);
+            this.cache = gson.fromJson(reader, Cache.class);
         } catch (FileNotFoundException e) {
-            System.out.println("File not found under given path: " + cacheFile);
+            System.out.println("File not found under given path: " + cachePath);
             System.out.println("A cache file will be created now. Please be patient.");
-            cache = refreshCache(extractor, translator);
-            saveCache(cache);
+            refreshCache(extractor, translator);
+            saveCache();
             System.out.println("Cache file created successfully.");
-            return cache;
+            return;
         } catch (IOException e) {
             System.out.println("Failed to load cache from file!");
             System.out.println(e.getMessage());
-            return null;
+            return;
         }
         System.out.println("Last update date: " + DataAnalyzer.fromDateTime(cache.getUpdateDate()));
-        if (needsUpdate(cache)) {
+        if (needsUpdate()) {
             System.out.println("Cache is not up-to-date. An update is required.");
-            if (updatesAllowed) {
+            if (UPDATES_ALLOWED) {
                 System.out.println("Update has started. Please be patient.");
-                cache = refreshCache(extractor, translator);
-                saveCache(cache);
+                refreshCache(extractor, translator);
+                saveCache();
                 System.out.println("Cache update finished successfully.");
             }
         } else {
             System.out.println("Cache is up-to-date. No update is required.");
         }
-        return cache;
     }
 
-    private Cache refreshCache(HttpExtractor extractor, RadarTranslator translator) {
+    private void refreshCache(HttpExtractor extractor, RadarReader translator) {
         Station[] stations = translator.readStationsData(extractor.extractAllStationsData());
 
         //all stations data (key is station name)
@@ -99,25 +104,29 @@ class CacheManager {
         }
 
         //save current date
-        return new Cache(LocalDateTime.now(), allStations, allSensors, allData, allIndices);
+        this.cache = new Cache(LocalDateTime.now(), allStations, allSensors, allData, allIndices);
     }
 
-    private void saveCache(Cache cache) {
+    private void saveCache() {
         //try with resources
-        try (Writer writer = new FileWriter(cacheFile)) {
+        try (Writer writer = new FileWriter(cachePath)) {
             Gson gson = new GsonBuilder().create();
-            gson.toJson(cache, writer);
+            gson.toJson(this.cache, writer);
         } catch (IOException e) {
             System.out.println("Failed to save cache file!");
             System.out.println(e.getMessage());
         }
     }
 
-    private boolean needsUpdate(Cache cache) {
+    private boolean needsUpdate() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime then = cache.getUpdateDate();
+        LocalDateTime then = this.cache.getUpdateDate();
         long diff = Math.abs(Duration.between(then, now).toHours());
         return diff >= UPDATE_FREQUENCY_HOURS;
+    }
+
+    public Cache getCache() {
+        return cache;
     }
 }
 

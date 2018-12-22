@@ -1,6 +1,6 @@
 package data;
 
-import radar.UnknownParameterException;
+import radar.exceptions.UnknownParameterException;
 
 import java.util.Arrays;
 
@@ -32,10 +32,6 @@ public enum ParamType {
 
     public static String[] getAllParamCodes() {
         return Arrays.stream(ParamType.values()).map(Enum::name).toArray(String[]::new);
-    }
-
-    public String[] getAllParamFormulas() {
-        return Arrays.stream(ParamType.values()).map(x -> getParamFormula()).toArray(String[]::new);
     }
 
     public static int getParamCount() {

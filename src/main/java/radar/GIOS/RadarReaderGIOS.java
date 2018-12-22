@@ -1,18 +1,19 @@
-package radar;
+package radar.GIOS;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import data.*;
+import radar.RadarReader;
 
 import java.io.IOException;
 
 /**
- * Class implementing {@link RadarTranslator} interface, which methods
+ * Class implementing {@link RadarReader} interface, which methods
  * work typically with Polish Gov API.
  */
-public class RadarTranslatorGov implements RadarTranslator {
+public class RadarReaderGIOS implements RadarReader {
 
     @Override
     public AirQualityIndex readIndexData(String data) throws IOException {

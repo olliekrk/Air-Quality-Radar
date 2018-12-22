@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Interface used to parse extracted strings containing JSON data into POJO.
  */
-public interface RadarTranslator {
+public interface RadarReader {
     AirQualityIndex readIndexData(String data) throws IOException;
 
     MeasurementData readMeasurementData(String measurementData);

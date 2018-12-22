@@ -1,16 +1,19 @@
-package radar;
+package radar.GIOS;
 
 import data.*;
+import radar.DataAnalyzer;
+import radar.exceptions.MissingDataException;
+import radar.RadarPrinter;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static radar.DataAnalyzer.fromDateTime;
 
-public class RadarPrinterGov implements RadarPrinter {
+public class RadarPrinterGIOS implements RadarPrinter {
 
     private static final int graphSize = 30;
-    private static final String graphChar = "<>";
+    private static final String graphChar = "@";
     private static final String graphFormat = "%s : %s : %s : %s";
 
     private static final int tableWidth = 50;

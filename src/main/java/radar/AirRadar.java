@@ -1,17 +1,19 @@
 package radar;
 
 import data.*;
+import radar.exceptions.MissingDataException;
+import radar.exceptions.UnknownParameterException;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class CacheRadar {
+public abstract class AirRadar {
 
-    HttpExtractor extractor;
-    RadarPrinter printer;
-    RadarTranslator translator;
-    CacheSeeker seeker;
+    protected HttpExtractor extractor;
+    protected RadarPrinter printer;
+    protected RadarReader reader;
+    protected CacheSeeker seeker;
 
     //1. Wypisanie aktualnego indeksu jakości powietrza dla podanej (nazwy) stacji pomiarowej
     public void getAirQualityIndexForStation(String stationName) throws MissingDataException {
@@ -92,7 +94,7 @@ public abstract class CacheRadar {
         List<Sensor> sensors = seeker
                 .findStationSensors(station.getId())
                 .stream()
-                .filter(x -> x.getParam().getParamFormula().equals(paramType.getParamFormula()))
+                .filter(x -> x.getParam().getParamFormula().compareToIgnoreCase(paramType.getParamFormula()) == 0)
                 .collect(Collectors.toList());
 
         class TmpClass implements Comparable {
@@ -249,7 +251,7 @@ public abstract class CacheRadar {
         return extractor;
     }
 
-    RadarTranslator getTranslator() {
-        return translator;
+    RadarReader getReader() {
+        return reader;
     }
 }

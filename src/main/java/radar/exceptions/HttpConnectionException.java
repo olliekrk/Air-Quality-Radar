@@ -1,4 +1,4 @@
-package radar;
+package radar.exceptions;
 
 public class HttpConnectionException extends RuntimeException {
     public HttpConnectionException(String message) {

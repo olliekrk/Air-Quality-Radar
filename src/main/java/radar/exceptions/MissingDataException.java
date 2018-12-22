@@ -1,4 +1,4 @@
-package radar;
+package radar.exceptions;
 
 public class MissingDataException extends Exception {
     public MissingDataException(String message) {
