@@ -7,11 +7,10 @@ import java.time.LocalDateTime;
 public interface RadarPrinter {
     void printIndexData(Station station, AirQualityIndex index);
 
-    void printMeasurement(Station stationName, Sensor paramName, MeasurementValue latestMeasurment);
+    void printMeasurement(Station stationName, Sensor paramName, MeasurementValue measurement);
 
-    void printAverageMeasurement(Station station, Sensor sensor, LocalDateTime since, LocalDateTime until, double averageMeasurment);
+    void printAverageMeasurement(Station station, Sensor sensor, LocalDateTime since, LocalDateTime until, double average);
 
-    //
     void printExtremeParamValuesSince(Station station, LocalDateTime since, Sensor sensor, MeasurementValue minValue, MeasurementValue maxValue);
 
     void printParamMinimalValue(Station station, Sensor minSensor, MeasurementValue minValue, LocalDateTime date);

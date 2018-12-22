@@ -14,26 +14,31 @@ public class AirRadarApp {
 
     public static void main(String[] args) {
 
-        CommandLine cmd = prepareCMD(args);
+        //creating radar instance
         AirRadar radar = new AirRadarGIOS();
 
+        //preparing cmd
+        CommandLine cmd = prepareCMD(args);
+
+        //checking which options are available
         List<AirRadarOption> availableOptions = AirRadarOption.getAvailableOptions(cmd);
 
-        //parsing arguments
+        //parsing program arguments
         String[] stationNames = cmd.hasOption("stations") ? cmd.getOptionValues("stations") : null;
         String paramCode = cmd.hasOption("parameter") ? cmd.getOptionValue("parameter") : null;
         LocalDateTime sinceDate = cmd.hasOption("since") ? DataAnalyzer.intoDateTime(cmd.getOptionValue("since")) : null;
         LocalDateTime untilDate = cmd.hasOption("until") ? DataAnalyzer.intoDateTime(cmd.getOptionValue("until")) : null;
 
+        //loop which allows to run application interactively
         Scanner in = new Scanner(System.in);
-
         boolean loop = true;
         while (loop) {
             AirRadarOption.printAvailableOptions(availableOptions, stationNames, paramCode, sinceDate, untilDate);
             AirRadarOption chosenOption = AirRadarOption.getValidOption(availableOptions, in);
             loop = runOption(radar, stationNames, paramCode, sinceDate, untilDate, chosenOption, in);
         }
-        System.out.println("Closing the application.");
+
+        System.out.println("(!) Closing the application.");
     }
 
     private static boolean runOption(AirRadar radar, String[] stationNames, String paramCode, LocalDateTime sinceDate, LocalDateTime untilDate, AirRadarOption chosenOption, Scanner in) {

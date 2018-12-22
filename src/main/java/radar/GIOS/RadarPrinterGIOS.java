@@ -46,7 +46,7 @@ public class RadarPrinterGIOS implements RadarPrinter {
     }
 
     @Override
-    public void printMeasurement(Station station, Sensor sensor, MeasurementValue latestMeasurement) {
+    public void printMeasurement(Station station, Sensor sensor, MeasurementValue measurement) {
         String result = bigSeparator +
                 "Parameter current measurement info. \n" +
                 bigSeparator +
@@ -54,13 +54,13 @@ public class RadarPrinterGIOS implements RadarPrinter {
                 String.format(sensorFormat, sensor.getParam().getParamName(), sensor.getId()) +
                 separator +
                 "Measurement: \n" +
-                String.format(defaultMeasurementInfoFormat, latestMeasurement.getDate(), latestMeasurement.getValue()) +
+                String.format(defaultMeasurementInfoFormat, measurement.getDate(), measurement.getValue()) +
                 separator;
         System.out.println(result);
     }
 
     @Override
-    public void printAverageMeasurement(Station station, Sensor sensor, LocalDateTime since, LocalDateTime until, double averageMeasurement) {
+    public void printAverageMeasurement(Station station, Sensor sensor, LocalDateTime since, LocalDateTime until, double average) {
         String result = bigSeparator +
                 "Parameter average measurement info. \n" +
                 bigSeparator +
@@ -68,7 +68,7 @@ public class RadarPrinterGIOS implements RadarPrinter {
                 String.format(sensorFormat, sensor.getParam().getParamName(), sensor.getId()) +
                 String.format(twoDatesFormat, fromDateTime(since), fromDateTime(until)) +
                 "Average measurement: \n" +
-                String.format(defaultMeasurementInfoFormat, "(above)", (averageMeasurement == -1) ? null : averageMeasurement) +
+                String.format(defaultMeasurementInfoFormat, "(above)", (average == -1) ? null : average) +
                 separator;
         System.out.println(result);
     }

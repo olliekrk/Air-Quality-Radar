@@ -6,7 +6,7 @@ import radar.HttpExtractor;
 
 /**
  * Class implementing {@link HttpExtractor} interface, which methods
- * work typically with Polish Gov API.
+ * work typically with Polish Gov GIOS API.
  */
 public class HttpExtractorGIOS implements HttpExtractor {
     private static final String STATIONS_URL = "http://api.gios.gov.pl/pjp-api/rest/station/findAll";

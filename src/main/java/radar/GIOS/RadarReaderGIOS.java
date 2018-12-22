@@ -11,7 +11,7 @@ import java.io.IOException;
 
 /**
  * Class implementing {@link RadarReader} interface, which methods
- * work typically with Polish Gov API.
+ * work typically with Polish Gov GIOS API.
  */
 public class RadarReaderGIOS implements RadarReader {
 

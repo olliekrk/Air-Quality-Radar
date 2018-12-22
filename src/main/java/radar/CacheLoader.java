@@ -37,28 +37,30 @@ public class CacheLoader {
             Gson gson = new GsonBuilder().create();
             this.cache = gson.fromJson(reader, Cache.class);
         } catch (FileNotFoundException e) {
-            System.out.println("File not found under given path: " + cachePath);
-            System.out.println("A cache file will be created now. Please be patient.");
+            System.out.println("(!) File not found under given path: " + cachePath);
+            System.out.println("(!) A cache file will be created now, this may take few minutes.");
             refreshCache(extractor, translator);
             saveCache();
-            System.out.println("Cache file created successfully.");
+            System.out.println("(!) Cache file created successfully.");
             return;
         } catch (IOException e) {
-            System.out.println("Failed to load cache from file!");
+            System.out.println("(!) Failed to load cache from file!");
             System.out.println(e.getMessage());
             return;
         }
-        System.out.println("Last update date: " + DataAnalyzer.fromDateTime(cache.getUpdateDate()));
+        System.out.println("(!) Last update date: " + DataAnalyzer.fromDateTime(cache.getUpdateDate()));
         if (needsUpdate()) {
-            System.out.println("Cache is not up-to-date. An update is required.");
+            System.out.println("(!) Cache is not up-to-date.");
+            System.out.println("(!) An update is required.");
             if (UPDATES_ALLOWED) {
-                System.out.println("Update has started. Please be patient.");
+                System.out.println("(!) Update has started, this may take few minutes.");
                 refreshCache(extractor, translator);
                 saveCache();
-                System.out.println("Cache update finished successfully.");
+                System.out.println("(!) Cache update finished successfully.");
             }
         } else {
-            System.out.println("Cache is up-to-date. No update is required.");
+            System.out.println("(!) Cache is up-to-date.");
+            System.out.println("(!) No update is required.");
         }
     }
 
@@ -111,9 +113,9 @@ public class CacheLoader {
         //try with resources
         try (Writer writer = new FileWriter(cachePath)) {
             Gson gson = new GsonBuilder().create();
-            gson.toJson(this.cache, writer);
+            gson.toJson(cache, writer);
         } catch (IOException e) {
-            System.out.println("Failed to save cache file!");
+            System.out.println("(!) Failed to save cache file!");
             System.out.println(e.getMessage());
         }
     }
