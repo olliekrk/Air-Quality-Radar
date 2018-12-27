@@ -145,7 +145,7 @@ public abstract class AirRadar {
     }
 
     //7. Dla podanego parametru wypisanie informacji: kiedy (dzień, godzina) i gdzie (stacja), miał on największą wartość, a kiedy i gdzie najmniejszą
-    public void getExtremeParamValueWhereAndWhen(String paramCode) throws UnknownParameterException {
+    public void getExtremeParamValueWhereAndWhen(String paramCode) throws UnknownParameterException, MissingDataException {
         Station minStation = null, maxStation = null;
         Sensor minSensor = null, maxSensor = null;
         MeasurementValue minValue = null, maxValue = null;
@@ -172,6 +172,8 @@ public abstract class AirRadar {
                 //just continue searching
             }
         }
+        if(minStation==null || maxStation == null || minValue == null || maxValue == null || minValue.getValue() == null || maxValue.getValue() == null)
+            throw new MissingDataException("No sufficient data is available for parameter: " + paramType.getParamFormula());
         printer.printExtremeParamValuesWhereAndWhen(paramCode, minStation, minSensor, minValue, maxStation, maxSensor, maxValue);
     }
 
@@ -218,9 +220,7 @@ public abstract class AirRadar {
         MeasurementValue minValue = null;
 
         //finding min and max measured values
-        for (Station station : stations) {
-            Sensor sensor = sensors.get(station.getId());
-            MeasurementData data = dataMap.get(sensor.getId());
+        for (MeasurementData data : dataMap.values()) {
             try {
                 MeasurementValue maybeMax = DataAnalyzer.getValue(data, since, until, DataAnalyzer.DateCheckType.BETWEEN, DataAnalyzer.ResultType.MAX);
                 MeasurementValue maybeMin = DataAnalyzer.getValue(data, since, until, DataAnalyzer.DateCheckType.BETWEEN, DataAnalyzer.ResultType.MIN);
@@ -234,24 +234,19 @@ public abstract class AirRadar {
                 //just do not compare
             }
         }
+
         if (maxValue == null || minValue == null)
             throw new MissingDataException("No sufficient data is available to draw a graph.");
 
-        double range = maxValue.getValue();// - minValue.getValue();
-
         //drawing graph
         for (Station station : stations) {
-            Sensor sensor = sensors.get(station.getId());
-            MeasurementData data = dataMap.get(sensor.getId());
-            printer.printGraph(station, sensor, data, since, until, paramType, range);
+            if (sensors.containsKey(station.getId())) {
+                Sensor sensor = sensors.get(station.getId());
+                if (dataMap.containsKey(sensor.getId())) {
+                    MeasurementData data = dataMap.get(sensor.getId());
+                    printer.printGraph(station, sensor, data, since, until, paramType, maxValue.getValue());
+                }
+            }
         }
-    }
-
-    HttpExtractor getExtractor() {
-        return extractor;
-    }
-
-    RadarReader getReader() {
-        return reader;
     }
 }

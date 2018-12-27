@@ -14,19 +14,17 @@ public abstract class DataAnalyzer {
     private static final String dateTimePattern = "yyyy-MM-dd HH:mm:ss";
 
     public enum DateCheckType {
-        IN,
+        ANY,
         BETWEEN,
-        SINCE,
-        ANY
-
+        IN,
+        SINCE
     }
 
     public enum ResultType {
-        DEFAULT,
         AVERAGE,
-        MIN,
-        MAX
-
+        DEFAULT,
+        MAX,
+        MIN
     }
 
     public static MeasurementValue getValue(MeasurementData data, LocalDateTime date1, LocalDateTime date2, DateCheckType dateCheckType, ResultType resultType) throws MissingDataException {
@@ -93,7 +91,6 @@ public abstract class DataAnalyzer {
                 }
                 return minValue;
         }
-
         throw new MissingDataException("Failed to analyze measurement data!");
     }
 
@@ -106,5 +103,4 @@ public abstract class DataAnalyzer {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimePattern);
         return dateTime.format(formatter);
     }
-
 }

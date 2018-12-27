@@ -23,10 +23,10 @@ public class HttpConnection implements Closeable {
 
     private void responseCheck() {
         try {
-            int response = connection.getResponseCode();
-            if (response != 200) {
+            int responseCode = connection.getResponseCode();
+            if (responseCode != 200) {
                 String msg = connection.getResponseMessage();
-                throw new HttpConnectionException(response + ": There was a problem with HTTP connection: " + msg);
+                throw new HttpConnectionException(String.format("[%d]: There is some problem with HTTP connection!\n%s", responseCode, msg));
             }
         } catch (IOException e) {
             throw new HttpConnectionException(e.getMessage());

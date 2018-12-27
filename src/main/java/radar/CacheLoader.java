@@ -64,7 +64,7 @@ public class CacheLoader {
         }
     }
 
-    private void refreshCache(HttpExtractor extractor, RadarReader translator) {
+    void refreshCache(HttpExtractor extractor, RadarReader translator) {
         Station[] stations = translator.readStationsData(extractor.extractAllStationsData());
 
         //all stations data (key is station name)
@@ -105,11 +105,12 @@ public class CacheLoader {
             }
         }
 
+
         //save current date
         this.cache = new Cache(LocalDateTime.now(), allStations, allSensors, allData, allIndices);
     }
 
-    private void saveCache() {
+    void saveCache() {
         //try with resources
         try (Writer writer = new FileWriter(cachePath)) {
             Gson gson = new GsonBuilder().create();
@@ -120,15 +121,19 @@ public class CacheLoader {
         }
     }
 
-    private boolean needsUpdate() {
+    boolean needsUpdate() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime then = this.cache.getUpdateDate();
+        LocalDateTime then = cache.getUpdateDate();
         long diff = Math.abs(Duration.between(then, now).toHours());
         return diff >= UPDATE_FREQUENCY_HOURS;
     }
 
     public Cache getCache() {
         return cache;
+    }
+
+    public void setCache(Cache cache) {
+        this.cache = cache;
     }
 }
 

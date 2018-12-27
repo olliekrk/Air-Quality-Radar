@@ -9,11 +9,11 @@ import radar.HttpExtractor;
  * work typically with Polish Gov GIOS API.
  */
 public class HttpExtractorGIOS implements HttpExtractor {
-    private static final String STATIONS_URL = "http://api.gios.gov.pl/pjp-api/rest/station/findAll";
-    private static final String SENSORS_URL_TEMPLATE = "http://api.gios.gov.pl/pjp-api/rest/station/sensors/%s";
-    private static final String DATA_URL_TEMPLATE = "http://api.gios.gov.pl/pjp-api/rest/data/getData/%s";
-    private static final String AIR_QUALITY_INDEX_URL_TEMPLATE = "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/%s";
-    private final HttpConnectionFactory httpConnectionFactory = new HttpConnectionFactory();
+    static final String STATIONS_URL = "http://api.gios.gov.pl/pjp-api/rest/station/findAll";
+    static final String SENSORS_URL_TEMPLATE = "http://api.gios.gov.pl/pjp-api/rest/station/sensors/%s";
+    static final String DATA_URL_TEMPLATE = "http://api.gios.gov.pl/pjp-api/rest/data/getData/%s";
+    static final String AIR_QUALITY_INDEX_URL_TEMPLATE = "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/%s";
+    private HttpConnectionFactory httpConnectionFactory = new HttpConnectionFactory();
 
     @Override
     public String extractIndexData(Integer stationId) {
@@ -45,4 +45,8 @@ public class HttpExtractorGIOS implements HttpExtractor {
         }
     }
 
+    //for tests
+    void setHttpConnectionFactory(HttpConnectionFactory httpConnectionFactory) {
+        this.httpConnectionFactory = httpConnectionFactory;
+    }
 }

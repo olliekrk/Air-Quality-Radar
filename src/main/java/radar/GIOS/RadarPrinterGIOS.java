@@ -109,7 +109,6 @@ public class RadarPrinterGIOS implements RadarPrinter {
 
     @Override
     public void printExtremeParamValuesWhereAndWhen(String paramName, Station minStation, Sensor minSensor, MeasurementValue minValue, Station maxStation, Sensor maxSensor, MeasurementValue maxValue) {
-
         String result = bigSeparator +
                 "Minimum and maximum measurement values for given parameter info. \n" +
                 bigSeparator +

@@ -9,7 +9,6 @@ public class AirRadarGIOS extends AirRadar {
         this.extractor = new HttpExtractorGIOS();
         this.printer = new RadarPrinterGIOS();
         this.reader = new RadarReaderGIOS();
-
         CacheLoader cacheLoader = new CacheLoader();
         cacheLoader.loadCache(this.extractor, this.reader);
         this.seeker = new CacheSeeker(cacheLoader.getCache());

@@ -29,6 +29,14 @@ public class AirRadarApp {
         LocalDateTime sinceDate = cmd.hasOption("since") ? DataAnalyzer.intoDateTime(cmd.getOptionValue("since")) : null;
         LocalDateTime untilDate = cmd.hasOption("until") ? DataAnalyzer.intoDateTime(cmd.getOptionValue("until")) : null;
 
+        //check if arguments are valid
+        try {
+            checkCMD(cmd);
+        } catch (MissingArgumentException e) {
+            System.out.println("~ " + e.getMessage());
+            return;
+        }
+
         //loop which allows to run application interactively
         Scanner in = new Scanner(System.in);
         boolean loop = true;
@@ -77,7 +85,7 @@ public class AirRadarApp {
                             loop = false;
                     }
                 } catch (UnknownParameterException | MissingDataException e) {
-                    System.out.println(e.getMessage());
+                    System.out.println("~ " + e.getMessage());
                 }
             }
         }
@@ -86,13 +94,13 @@ public class AirRadarApp {
             try {
                 radar.drawGraph(stationNames, paramCode, sinceDate, untilDate);
             } catch (UnknownParameterException | MissingDataException e) {
-                System.out.println(e.getMessage());
+                System.out.println("~ " + e.getMessage());
             }
         } else if (chosenOption == AirRadarOption.EXTREME_MEASUREMENT_VALUE_PARAM) {
             try {
                 radar.getExtremeParamValueWhereAndWhen(paramCode);
-            } catch (UnknownParameterException e) {
-                System.out.println(e.getMessage());
+            } catch (UnknownParameterException | MissingDataException e) {
+                System.out.println("~ " + e.getMessage());
             }
         }
         return loop;
@@ -171,6 +179,30 @@ public class AirRadarApp {
         }
 
         return commandLine;
+    }
+
+    private static void checkCMD(CommandLine cmd) throws MissingArgumentException {
+        if (cmd.hasOption("stations")) {
+            if (cmd.getOptionValues("stations").length == 0)
+                throw new MissingArgumentException("No station was given as an argument!");
+        }
+
+        if (cmd.hasOption("parameter")) {
+            if (cmd.getOptionValue("parameter") == null)
+                throw new MissingArgumentException("No parameter was given as an argument!");
+        }
+
+        if (cmd.hasOption("since")) {
+            LocalDateTime since = DataAnalyzer.intoDateTime(cmd.getOptionValue("since"));
+            LocalDateTime now = LocalDateTime.now();
+            if (since.isAfter(now)) throw new IllegalArgumentException("\"since\" option's argument is invalid!");
+        }
+
+        if (cmd.hasOption("until")) {
+            LocalDateTime until = DataAnalyzer.intoDateTime(cmd.getOptionValue("until"));
+            LocalDateTime now = LocalDateTime.now();
+            if (until.isAfter(now)) throw new IllegalArgumentException("\"until\" option's argument is invalid!");
+        }
     }
 
     /*
