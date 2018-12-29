@@ -4,7 +4,11 @@ import radar.AirRadar;
 import radar.CacheLoader;
 import radar.CacheSeeker;
 
-public class AirRadarGIOS extends AirRadar {
+/**
+ * Class which sets up AirRadar to be compatible with GIOś API.
+ * Part of "Strategy" and "Factory" design patterns.
+ */
+class AirRadarGIOS extends AirRadar {
     AirRadarGIOS() {
         this.reader = new RadarReaderGIOS();
         this.extractor = new HttpExtractorGIOS();

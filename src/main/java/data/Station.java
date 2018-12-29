@@ -3,6 +3,9 @@ package data;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Data container class for storing parsed JSON station information.
+ */
 public class Station {
 
     private Integer id;

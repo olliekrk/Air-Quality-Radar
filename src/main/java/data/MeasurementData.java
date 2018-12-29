@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Data container class for storing parsed JSON measurement data.
+ */
 public class MeasurementData {
 
     private String key;

@@ -16,23 +16,53 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class responsible for loading local cache file, containing deserialized {@link Cache} object.
+ * Also responsible for updating cache file with given frequency.
+ */
 public class CacheLoader {
 
+    /**
+     * Frequency in hours, telling how often cache file should be updated.
+     */
     private static final long UPDATE_FREQUENCY_HOURS = 2;
+    /**
+     * Flag telling whether updates of cache are allowed.
+     */
     private static final boolean UPDATES_ALLOWED = true;
+    /**
+     * Path to a cache file.
+     */
     private final String cachePath;
+    /**
+     * Loaded cache.
+     */
     private Cache cache;
 
-    //for default cache file localization
+    /**
+     * Class constructor for default local cache file localization.
+     */
     public CacheLoader() {
         this.cachePath = "radarCache.json";
     }
 
+    /**
+     * Class constructor for custom local cache file localization.
+     *
+     * @param cachePath path to a destination where cache file should be located
+     */
     //for custom cache file localization
     public CacheLoader(String cachePath) {
         this.cachePath = cachePath;
     }
 
+    /**
+     * Loads {@link Cache} from cache path.
+     * Performs cache update operation if it is necessary, saves cache to a file afterwards.
+     *
+     * @param extractor  {@link HttpExtractor} used to extract data to be saved
+     * @param translator {@link RadarReader} used to translate JSON data into POJO
+     */
     public void loadCache(HttpExtractor extractor, RadarReader translator) {
         try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(cachePath), StandardCharsets.UTF_8))) {
             Gson gson = new GsonBuilder().create();
@@ -69,6 +99,16 @@ public class CacheLoader {
         return cache;
     }
 
+    void setCache(Cache cache) {
+        this.cache = cache;
+    }
+
+    /**
+     * Method telling whether cache file is up-to-date or not.
+     * Prints information how many hours passed since cache was updated.
+     *
+     * @return true if cache needs update, false otherwise
+     */
     boolean needsUpdate() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime then = cache.getUpdateDate();
@@ -77,10 +117,12 @@ public class CacheLoader {
         return diff >= UPDATE_FREQUENCY_HOURS;
     }
 
-    void setCache(Cache cache) {
-        this.cache = cache;
-    }
-
+    /**
+     * Method responsible for updating cache.
+     *
+     * @param extractor  {@link HttpExtractor} used to extract data to be saved
+     * @param translator {@link RadarReader} used to translate JSON data into POJO
+     */
     private void refreshCache(HttpExtractor extractor, RadarReader translator) {
         Station[] stations = translator.readStationsData(extractor.extractAllStationsData());
 
@@ -127,6 +169,9 @@ public class CacheLoader {
         this.cache = new Cache(LocalDateTime.now(), allStations, allSensors, allData, allIndices);
     }
 
+    /**
+     * Method responsible for saving loaded cache into file under cache path.
+     */
     private void saveCache() {
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(cachePath), StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();

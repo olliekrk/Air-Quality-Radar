@@ -2,6 +2,11 @@ package radar.AIRLY;
 
 import radar.HttpExtractor;
 
+/**
+ * Class implementing {@link HttpExtractor} interface, which methods
+ * work typically with Airly API.
+ * Part of "Strategy" design pattern.
+ */
 public class HttpExtractorAIRLY implements HttpExtractor {
     @Override
     public String extractAllStationsData() {

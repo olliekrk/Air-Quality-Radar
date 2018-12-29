@@ -10,6 +10,11 @@ import java.util.Collections;
 
 import static radar.DataAnalyzer.fromDateTime;
 
+/**
+ * Class implementing {@link RadarPrinter} interface
+ * which is fully compatible with GIOś API.
+ * Part of "Strategy" design pattern.
+ */
 public class RadarPrinterGIOS implements RadarPrinter {
 
     private static final int graphSize = 30;

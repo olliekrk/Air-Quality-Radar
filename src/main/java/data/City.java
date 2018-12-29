@@ -3,6 +3,9 @@ package data;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Data container class for storing parsed JSON city information.
+ */
 public class City {
 
     private Integer id;

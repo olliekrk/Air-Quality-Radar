@@ -8,23 +8,58 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-//"Facade" design pattern
+/**
+ * Main air quality radar application entry-class providing interface to proceed JSON data extracted
+ * from air quality APIs.
+ * Main part of "Facade" design pattern as application user may call only methods of this class directly.
+ * Part of "Strategy" design patterns, as {@link HttpExtractor}, {@link RadarPrinter} and {@link RadarReader}
+ * can be implemented independently from each other, still maintaining behaviour of this class.
+ * Also part of "Factory" design pattern.
+ */
 public abstract class AirRadar {
 
-    //all 4 are parts of separate "Strategy" design pattern
+    //all 4 are parts of separate "Strategy" design patterns
+    /**
+     * used to extract data from HTTP service
+     */
     protected HttpExtractor extractor;
+    /**
+     * used to print data to the console
+     */
     protected RadarPrinter printer;
+    /**
+     * used to convert JSON data into POJO(s)
+     */
     protected RadarReader reader;
+    /**
+     * used to extract data from local cache file
+     */
     protected CacheSeeker seeker;
 
-    //1. Wypisanie aktualnego indeksu jakości powietrza dla podanej (nazwy) stacji pomiarowej
+    /**
+     * Finds and prints information about current air quality index for station of given name,
+     * contained by {@link AirQualityIndex} and extracted from local cache.
+     *
+     * @param stationName name of station for which data will be analyzed
+     * @throws MissingDataException when station's name has not been recognized
+     *                              or when cache does not contain data for given station name
+     */
     public void getAirQualityIndexForStation(String stationName) throws MissingDataException {
         Station station = seeker.findStation(stationName);
         AirQualityIndex index = seeker.findIndex(station.getId());
         printer.printIndexData(station, index);
     }
 
-    //2. Wypisanie dla podanego dnia, godziny oraz stacji pomiarowej (czytelna nazwa stacji) aktualnej wartości danego parametru (np. PM10)
+    /**
+     * Finds and prints information about parameter's measurement value for given station, date and time.
+     *
+     * @param stationName name of station for which data will be analyzed
+     * @param paramCode   parameter for which measurement data will be analyzed
+     * @param date        date and time for which measurement data will be analyzed
+     * @throws MissingDataException      when there is no sufficient information available in local cache
+     *                                   or when cache does not contain data for given station name
+     * @throws UnknownParameterException when given parameter is not recognized as any supported parameter
+     */
     public void getParamValueForStation(String stationName, String paramCode, LocalDateTime date) throws MissingDataException, UnknownParameterException {
         Station station = seeker.findStation(stationName);
         ParamType paramType = ParamType.getParamType(paramCode);
@@ -35,7 +70,17 @@ public abstract class AirRadar {
         printer.printMeasurement(station, sensor, resultValue);
     }
 
-    //3. Obliczenie średniej wartości zanieczyszczenia / parametru (np. SO2) za podany okres dla danej stacji
+    /**
+     * Finds and prints information about parameter's average measurement value for given station and period of time.
+     *
+     * @param stationName name of station for which data will be analyzed
+     * @param paramCode   parameter for which measurement data will be analyzed
+     * @param since       date and time since when measurement data should be analyzed
+     * @param until       date and time until when measurement data should be analyzed
+     * @throws MissingDataException      when there is no sufficient information available in local cache
+     *                                   or when cache does not contain data for given station name
+     * @throws UnknownParameterException when given parameter is not recognized as any supported parameter
+     */
     public void getAverageParamValuePeriod(String stationName, String paramCode, LocalDateTime since, LocalDateTime until) throws MissingDataException, UnknownParameterException {
         Station station = seeker.findStation(stationName);
         ParamType paramType = ParamType.getParamType(paramCode);
@@ -46,7 +91,14 @@ public abstract class AirRadar {
         printer.printAverageMeasurement(station, sensor, since, until, resultValue.getValue());
     }
 
-    //4. Odszukanie, dla wymienionych stacji, parametru którego wartość, począwszy od podanej godziny (danego dnia), uległa największym wahaniom
+    /**
+     * Finds and prints information about parameter's extreme measurement values for given station and since given date.
+     *
+     * @param stationName name of station for which data will be analyzed
+     * @param since       date and time since when measurement data should be analyzed
+     * @throws MissingDataException when there is no sufficient information available in local cache
+     *                              or when cache does not contain data for given station name
+     */
     public void getExtremeParamValuePeriod(String stationName, LocalDateTime since) throws MissingDataException {
         Station station = seeker.findStation(stationName);
         List<Sensor> sensors = seeker.findStationSensors(station.getId());
@@ -71,7 +123,14 @@ public abstract class AirRadar {
         printer.printExtremeParamValuesSince(station, since, currentSensor, currentMin, currentMax);
     }
 
-    //5. Odszukanie parametru, którego wartość była najmniejsza o podanej godzinie podanego dnia
+    /**
+     * Finds and prints information about parameter which had the lowest measurement value on given station and in given date.
+     *
+     * @param stationName name of station for which data will be analyzed
+     * @param date        date and time for which measurement data should be analyzed
+     * @throws MissingDataException when there is no sufficient information available in local cache
+     *                              or when cache does not contain data for given station name
+     */
     public void getParamOfMinimalValue(String stationName, LocalDateTime date) throws MissingDataException {
         Station station = seeker.findStation(stationName);
         List<Sensor> sensors = seeker.findStationSensors(station.getId());
@@ -88,7 +147,17 @@ public abstract class AirRadar {
         printer.printParamMinimalValue(station, minSensor, minValue, date);
     }
 
-    //6. Dla podanej stacji, wypisanie N stanowisk pomiarowych, posortowanych (rosnąco), które o podanej godzinie określonego dnia, zanotowały największą wartość podanego parametru
+    /**
+     * Finds and prints N sensor of given station, sorted ascending, which measured highest parameter's value in given date.
+     *
+     * @param stationName name of station for which data will be analyzed
+     * @param paramCode   parameter for which measurement data will be analyzed
+     * @param date        date and time for which measurement data should be analyzed
+     * @param n           maximum number of sensors that should be printed
+     * @throws MissingDataException      when there is no sufficient information available in local cache
+     *                                   or when cache does not contain data for given station name
+     * @throws UnknownParameterException when given parameter is not recognized as any supported parameter
+     */
     public void getNSensorsWithMaximumParamValue(String stationName, String paramCode, LocalDateTime date, int n) throws MissingDataException, UnknownParameterException {
         Station station = seeker.findStation(stationName);
         ParamType paramType = ParamType.getParamType(paramCode);
@@ -146,7 +215,13 @@ public abstract class AirRadar {
         printer.printNSensors(station, sortedSensors, sortedValues, date, paramCode, n);
     }
 
-    //7. Dla podanego parametru wypisanie informacji: kiedy (dzień, godzina) i gdzie (stacja), miał on największą wartość, a kiedy i gdzie najmniejszą
+    /**
+     * Finds and prints information about when and where were measured extreme given parameter's values.
+     *
+     * @param paramCode parameter for which measurement data will be analyzed
+     * @throws MissingDataException      when there is no sufficient information available in local cache
+     * @throws UnknownParameterException when given parameter is not recognized as any supported parameter
+     */
     public void getExtremeParamValueWhereAndWhen(String paramCode) throws UnknownParameterException, MissingDataException {
         Station minStation = null, maxStation = null;
         Sensor minSensor = null, maxSensor = null;
@@ -179,9 +254,16 @@ public abstract class AirRadar {
         printer.printExtremeParamValuesWhereAndWhen(paramCode, minStation, minSensor, minValue, maxStation, maxSensor, maxValue);
     }
 
-    //8. Rysowanie (w trybie tekstowym) wspólnego (dla wszystkich podanych godzin) wykresu zmian wartości
-    // (np. wykres słupkowy, za pomocą różnorodnych znaków ASCII) podanego parametru w układzie godzinowym, tzn. jaka było zanieczyszczenie (np. SO2)
-    //Dla punktu 8, jako dane wejściowe programu podajemy: nazwę parametru, nazwy stacji pomiarowych oraz dwa czasy: godzinę początkową oraz końcową
+    /**
+     * Finds and prints bar chart in console displaying how measurement values changed every hour for every station.
+     *
+     * @param stationNames names of stations for which data will be analyzed
+     * @param paramCode    parameter for which measurement data will be analyzed
+     * @param since        date and time since when measurement data should be analyzed (starting hour)
+     * @param until        date and time until when measurement data should be analyzed (ending hour)
+     * @throws MissingDataException      when there is no sufficient information available in local cache
+     * @throws UnknownParameterException when given parameter is not recognized as any supported parameter
+     */
     public void drawGraph(String[] stationNames, String paramCode, LocalDateTime since, LocalDateTime until) throws UnknownParameterException, MissingDataException {
         ParamType paramType = ParamType.getParamType(paramCode);
 

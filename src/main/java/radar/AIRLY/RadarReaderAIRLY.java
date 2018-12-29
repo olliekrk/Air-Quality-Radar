@@ -8,6 +8,11 @@ import radar.RadarReader;
 
 import java.io.IOException;
 
+/**
+ * Class implementing {@link RadarReader} interface, which methods
+ * work typically with Airly API.
+ * Part of "Strategy" design pattern.
+ */
 public class RadarReaderAIRLY implements RadarReader {
     @Override
     public AirQualityIndex readIndexData(String data) throws IOException {

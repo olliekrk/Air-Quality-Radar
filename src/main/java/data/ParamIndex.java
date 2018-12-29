@@ -3,6 +3,9 @@ package data;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Data container class for storing parsed JSON air quality parameter's index information.
+ */
 public class ParamIndex {
     private String paramName;
     private String calcDate;
