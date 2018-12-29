@@ -8,6 +8,7 @@ import data.Sensor;
 import data.Station;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -33,7 +34,7 @@ public class CacheLoader {
     }
 
     public void loadCache(HttpExtractor extractor, RadarReader translator) {
-        try (Reader reader = new FileReader(cachePath)) {
+        try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(cachePath), StandardCharsets.UTF_8))) {
             Gson gson = new GsonBuilder().create();
             this.cache = gson.fromJson(reader, Cache.class);
         } catch (FileNotFoundException e) {
@@ -127,9 +128,8 @@ public class CacheLoader {
     }
 
     private void saveCache() {
-        //try with resources
-        try (Writer writer = new FileWriter(cachePath)) {
-            Gson gson = new GsonBuilder().create();
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(cachePath), StandardCharsets.UTF_8)) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(cache, writer);
         } catch (IOException e) {
             System.out.println("(!) Failed to save cache file!");

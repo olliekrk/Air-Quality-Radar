@@ -109,6 +109,7 @@ public class AirRadarApp {
     }
 
     private static CommandLine prepareCMD(String[] args) {
+        final String cmdSyntax = "java -jar \"Air Quality Radar.jar\"";
         Options options = new Options();
 
         Option help = Option.builder("h")
@@ -154,7 +155,7 @@ public class AirRadarApp {
                 .addOption(date2);
 
 
-        String header = "\nList of options available to apply: \n\n";
+        String header = "\nList of arguments available to run application with: \n\n";
         String footer = "\nThis application was made by Olgierd Królik.\n\n";
         HelpFormatter helpFormatter = new HelpFormatter();
         CommandLineParser parser = new DefaultParser();
@@ -166,18 +167,19 @@ public class AirRadarApp {
             System.out.println(e.getMessage());
             System.out.println("Inappropriate use of application.");
             System.out.println("Please follow syntax displayed below.");
-            helpFormatter.printHelp("airradar", header, options, footer, true);
+            helpFormatter.printHelp(cmdSyntax, header, options, footer, true);
             System.exit(1);
             return null;
         }
 
         if (commandLine.hasOption("h")) {
-            helpFormatter.printHelp("airradar", header, options, footer, true);
+            helpFormatter.printHelp(cmdSyntax, header, options, footer, true);
         }
         if (args.length == 0) {
             System.out.println("No arguments were passed into application.");
             System.out.println("Please follow syntax displayed below.");
-            helpFormatter.printHelp("airradar", header, options, footer, true);
+            helpFormatter.printHelp(cmdSyntax, header, options, footer, true);
+            System.exit(1);
         }
 
         return commandLine;
