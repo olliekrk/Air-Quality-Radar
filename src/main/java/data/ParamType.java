@@ -1,6 +1,6 @@
 package data;
 
-import radar.exceptions.UnknownParameterException;
+import exceptions.UnknownParameterException;
 
 import java.util.Arrays;
 

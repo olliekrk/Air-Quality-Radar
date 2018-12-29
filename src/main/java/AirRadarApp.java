@@ -1,10 +1,11 @@
+import exceptions.MissingDataException;
+import exceptions.UnknownParameterException;
 import org.apache.commons.cli.*;
 import radar.AirRadar;
+import radar.AirRadarFactory;
 import radar.AirRadarOption;
 import radar.DataAnalyzer;
-import radar.GIOS.AirRadarGIOS;
-import radar.exceptions.MissingDataException;
-import radar.exceptions.UnknownParameterException;
+import radar.GIOS.AirRadarFactoryGIOS;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,7 +16,8 @@ public class AirRadarApp {
     public static void main(String[] args) {
 
         //creating radar instance
-        AirRadar radar = new AirRadarGIOS();
+        AirRadarFactory radarFactory = new AirRadarFactoryGIOS();
+        AirRadar radar = radarFactory.createAirRadar();
 
         //preparing cmd
         CommandLine cmd = prepareCMD(args);
@@ -206,7 +208,6 @@ public class AirRadarApp {
     }
 
     /*
-    TODO: uruchamianie z IO, jar
-    TODO: wzorzec projektowy
+    TODO: dokumentacja, JAR
      */
 }

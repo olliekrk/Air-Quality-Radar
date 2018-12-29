@@ -1,6 +1,6 @@
 package radar;
 
-import radar.exceptions.HttpConnectionException;
+import exceptions.HttpConnectionException;
 
 import java.io.BufferedReader;
 import java.io.Closeable;

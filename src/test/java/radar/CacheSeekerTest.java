@@ -1,10 +1,10 @@
 package radar;
 
 import data.*;
+import exceptions.MissingDataException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import radar.exceptions.MissingDataException;
 
 import java.util.HashMap;
 import java.util.List;

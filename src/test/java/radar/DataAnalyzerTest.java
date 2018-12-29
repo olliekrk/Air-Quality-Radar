@@ -2,10 +2,10 @@ package radar;
 
 import data.MeasurementData;
 import data.MeasurementValue;
+import exceptions.MissingDataException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
-import radar.exceptions.MissingDataException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package radar;
 
 import data.*;
-import radar.exceptions.MissingDataException;
+import exceptions.MissingDataException;
 
 import java.util.List;
 

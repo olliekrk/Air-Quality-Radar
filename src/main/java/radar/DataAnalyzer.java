@@ -2,7 +2,7 @@ package radar;
 
 import data.MeasurementData;
 import data.MeasurementValue;
-import radar.exceptions.MissingDataException;
+import exceptions.MissingDataException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

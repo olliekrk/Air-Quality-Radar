@@ -1,8 +1,8 @@
 package radar;
 
 import data.ParamType;
+import exceptions.UnknownParameterException;
 import org.junit.Test;
-import radar.exceptions.UnknownParameterException;
 
 import java.util.ArrayList;
 import java.util.Arrays;

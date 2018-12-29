@@ -1,8 +1,8 @@
 package radar.GIOS;
 
 import data.*;
+import exceptions.MissingDataException;
 import radar.DataAnalyzer;
-import radar.exceptions.MissingDataException;
 import radar.RadarPrinter;
 
 import java.time.LocalDateTime;

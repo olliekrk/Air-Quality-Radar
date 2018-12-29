@@ -1,15 +1,17 @@
 package radar;
 
 import data.*;
-import radar.exceptions.MissingDataException;
-import radar.exceptions.UnknownParameterException;
+import exceptions.MissingDataException;
+import exceptions.UnknownParameterException;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+//"Facade" design pattern
 public abstract class AirRadar {
 
+    //all 4 are parts of separate "Strategy" design pattern
     protected HttpExtractor extractor;
     protected RadarPrinter printer;
     protected RadarReader reader;
@@ -172,7 +174,7 @@ public abstract class AirRadar {
                 //just continue searching
             }
         }
-        if(minStation==null || maxStation == null || minValue == null || maxValue == null || minValue.getValue() == null || maxValue.getValue() == null)
+        if (minStation == null || maxStation == null || minValue.getValue() == null || maxValue.getValue() == null)
             throw new MissingDataException("No sufficient data is available for parameter: " + paramType.getParamFormula());
         printer.printExtremeParamValuesWhereAndWhen(paramCode, minStation, minSensor, minValue, maxStation, maxSensor, maxValue);
     }

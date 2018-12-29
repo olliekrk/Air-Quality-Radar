@@ -1,7 +1,7 @@
 package radar;
 
+import exceptions.HttpConnectionException;
 import org.junit.Test;
-import radar.exceptions.HttpConnectionException;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
