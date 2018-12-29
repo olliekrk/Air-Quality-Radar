@@ -206,10 +206,7 @@ public class AirRadarApp {
     }
 
     /*
-    TODO: uruchamianie z IO
-    TODO: jar
-    TODO: testy - Mockito
+    TODO: uruchamianie z IO, jar
     TODO: wzorzec projektowy
-    TODO: jedna funkcjonalność kompatybilna z Airly
      */
 }

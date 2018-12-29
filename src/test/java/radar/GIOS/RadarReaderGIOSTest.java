@@ -1,16 +1,18 @@
 package radar.GIOS;
 
+import data.AirQualityIndex;
+import data.MeasurementData;
+import data.Sensor;
+import data.Station;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import radar.HttpConnection;
-import radar.HttpConnectionFactory;
+
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertNotNull;
 
-public class HttpExtractorGIOSTest {
+public class RadarReaderGIOSTest {
 
     private final String INDEX_DATA_EXAMPLE = "{\n" +
             "    \"id\": 52,\n" +
@@ -91,66 +93,43 @@ public class HttpExtractorGIOSTest {
             "    }]\n" +
             "}";
 
-    private HttpConnectionFactory factoryMock;
-    private HttpConnection connectionMock;
-    private HttpExtractorGIOS extractor = new HttpExtractorGIOS();
+    private RadarReaderGIOS reader;
 
     @Before
     public void setUp() {
-        factoryMock = mock(HttpConnectionFactory.class);
-        connectionMock = mock(HttpConnection.class);
-        extractor.setHttpConnectionFactory(factoryMock);
-        when(factoryMock.build(anyString())).thenReturn(connectionMock);
+        reader = new RadarReaderGIOS();
     }
 
     @Test
-    public void extractIndexData() {
-        when(connectionMock.getResponseAsString()).thenReturn(INDEX_DATA_EXAMPLE);
-
-        assertEquals(extractor.extractIndexData(1), INDEX_DATA_EXAMPLE);
-        Mockito.verify(factoryMock, times(1)).build(String.format(HttpExtractorGIOS.AIR_QUALITY_INDEX_URL_TEMPLATE, 1));
-        Mockito.verify(connectionMock, times(1)).getResponseAsString();
-        Mockito.verify(connectionMock, times(1)).close();
+    public void readIndexData() throws IOException {
+        AirQualityIndex index = reader.readIndexData(INDEX_DATA_EXAMPLE);
+        assertNotNull(index);
+        assertEquals(index.getId(), Integer.valueOf(52));
+        assertEquals(8, index.getParamIndex().length);
     }
 
     @Test
-    public void extractAllStationsData() {
-        when(connectionMock.getResponseAsString()).thenReturn(STATIONS_DATA_EXAMPLE);
-
-        assertEquals(extractor.extractAllStationsData(), STATIONS_DATA_EXAMPLE);
-        Mockito.verify(factoryMock, times(1)).build(HttpExtractorGIOS.STATIONS_URL);
-        Mockito.verify(connectionMock, times(1)).getResponseAsString();
-        Mockito.verify(connectionMock, times(1)).close();
+    public void readMeasurementData() {
+        MeasurementData data = reader.readMeasurementData(MEASUREMENT_DATA_EXAMPLE);
+        assertNotNull(data);
+        assertEquals(data.getKey(), "PM10");
+        assertEquals(data.getValues().size(), 2);
     }
 
     @Test
-    public void extractAllSensorsData() {
-        when(connectionMock.getResponseAsString()).thenReturn(SENSORS_DATA_EXAMPLE);
-
-        assertEquals(extractor.extractAllSensorsData(1), SENSORS_DATA_EXAMPLE);
-        Mockito.verify(factoryMock, times(1)).build(String.format(HttpExtractorGIOS.SENSORS_URL_TEMPLATE, 1));
-        Mockito.verify(connectionMock, times(1)).getResponseAsString();
-        Mockito.verify(connectionMock, times(1)).close();
+    public void readSensorsData() {
+        Sensor[] sensors = reader.readSensorsData(SENSORS_DATA_EXAMPLE);
+        assertNotNull(sensors);
+        assertEquals(2, sensors.length);
+        assertEquals(Integer.valueOf(92), sensors[0].getId());
+        assertEquals(Integer.valueOf(88), sensors[1].getId());
     }
 
     @Test
-    public void extractMeasurementData() {
-        when(connectionMock.getResponseAsString()).thenReturn(MEASUREMENT_DATA_EXAMPLE);
-
-        assertEquals(extractor.extractMeasurementData(1), MEASUREMENT_DATA_EXAMPLE);
-        Mockito.verify(factoryMock, times(1)).build(String.format(HttpExtractorGIOS.DATA_URL_TEMPLATE, 1));
-        Mockito.verify(connectionMock, times(1)).getResponseAsString();
-        Mockito.verify(connectionMock, times(1)).close();
-    }
-
-    @Test
-    public void connectAndExtract() {
-        String response = "some response";
-        String url = "some url";
-        when(connectionMock.getResponseAsString()).thenReturn(response);
-        assertEquals(extractor.connectAndExtract(url), response);
-        Mockito.verify(factoryMock, times(1)).build(url);
-        Mockito.verify(connectionMock, times(1)).getResponseAsString();
-        Mockito.verify(connectionMock, times(1)).close();
+    public void readStationsData() {
+        Station[] stations = reader.readStationsData(STATIONS_DATA_EXAMPLE);
+        assertNotNull(stations);
+        assertEquals(1, stations.length);
+        assertEquals("Działoszyn", stations[0].getStationName());
     }
 }

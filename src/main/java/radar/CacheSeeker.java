@@ -17,13 +17,16 @@ public class CacheSeeker {
         return cache;
     }
 
-    Sensor findStationSensorParam(Integer stationId, ParamType param) throws MissingDataException {
-        List<Sensor> stationSensors = findStationSensors(stationId);
-        for (Sensor sensor : stationSensors) {
-            if (sensor.getParam().getParamFormula().compareToIgnoreCase(param.getParamFormula()) == 0)
-                return sensor;
-        }
-        throw new MissingDataException("Failed to find sensor of " + param.getParamFormula() + " on station with id: " + stationId);
+    MeasurementData findData(Integer sensorId) throws MissingDataException {
+        MeasurementData data = cache.getAllData().get(sensorId);
+        if (data != null) return data;
+        throw new MissingDataException("Failed to find data of sensor with id " + sensorId);
+    }
+
+    AirQualityIndex findIndex(Integer stationId) throws MissingDataException {
+        AirQualityIndex index = cache.getAllIndices().get(stationId);
+        if (index != null) return index;
+        throw new MissingDataException("Failed to find air quality index on station with id " + stationId);
     }
 
     Station findStation(String stationName) throws MissingDataException {
@@ -38,15 +41,12 @@ public class CacheSeeker {
         throw new MissingDataException("Failed to find any sensor on station with id " + stationId);
     }
 
-    AirQualityIndex findIndex(Integer stationId) throws MissingDataException {
-        AirQualityIndex index = cache.getAllIndices().get(stationId);
-        if (index != null) return index;
-        throw new MissingDataException("Failed to find air quality index on station with id " + stationId);
-    }
-
-    MeasurementData findData(Integer sensorId) throws MissingDataException {
-        MeasurementData data = cache.getAllData().get(sensorId);
-        if (data != null) return data;
-        throw new MissingDataException("Failed to find data of sensor with id " + sensorId);
+    Sensor findStationSensorParam(Integer stationId, ParamType param) throws MissingDataException {
+        List<Sensor> stationSensors = findStationSensors(stationId);
+        for (Sensor sensor : stationSensors) {
+            if (sensor.getParam().getParamFormula().compareToIgnoreCase(param.getParamFormula()) == 0)
+                return sensor;
+        }
+        throw new MissingDataException("Failed to find sensor of " + param.getParamFormula() + " on station with id: " + stationId);
     }
 }

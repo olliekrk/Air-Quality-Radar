@@ -13,7 +13,9 @@ import static org.junit.Assert.*;
 
 public class ParamTypeTest {
 
-    private List<String> codes = Arrays.asList("C6H6", "CO", "NO2", "O3", "PM10", "PM25", "SO2", "ST");
+
+    private List<String> codes =
+            Arrays.stream(ParamType.values()).map(Enum::name).collect(Collectors.toList());
 
     @Test
     public void getParamType() throws UnknownParameterException {

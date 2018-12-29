@@ -64,7 +64,23 @@ public class CacheLoader {
         }
     }
 
-    void refreshCache(HttpExtractor extractor, RadarReader translator) {
+    public Cache getCache() {
+        return cache;
+    }
+
+    boolean needsUpdate() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime then = cache.getUpdateDate();
+        long diff = Math.abs(Duration.between(then, now).toHours());
+        System.out.println("(!) Hours since last update: " + diff);
+        return diff >= UPDATE_FREQUENCY_HOURS;
+    }
+
+    void setCache(Cache cache) {
+        this.cache = cache;
+    }
+
+    private void refreshCache(HttpExtractor extractor, RadarReader translator) {
         Station[] stations = translator.readStationsData(extractor.extractAllStationsData());
 
         //all stations data (key is station name)
@@ -110,7 +126,7 @@ public class CacheLoader {
         this.cache = new Cache(LocalDateTime.now(), allStations, allSensors, allData, allIndices);
     }
 
-    void saveCache() {
+    private void saveCache() {
         //try with resources
         try (Writer writer = new FileWriter(cachePath)) {
             Gson gson = new GsonBuilder().create();
@@ -119,21 +135,6 @@ public class CacheLoader {
             System.out.println("(!) Failed to save cache file!");
             System.out.println(e.getMessage());
         }
-    }
-
-    boolean needsUpdate() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime then = cache.getUpdateDate();
-        long diff = Math.abs(Duration.between(then, now).toHours());
-        return diff >= UPDATE_FREQUENCY_HOURS;
-    }
-
-    public Cache getCache() {
-        return cache;
-    }
-
-    public void setCache(Cache cache) {
-        this.cache = cache;
     }
 }
 

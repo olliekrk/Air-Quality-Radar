@@ -1,9 +1,9 @@
 package radar;
 
+import data.AirQualityIndex;
 import data.MeasurementData;
 import data.Sensor;
 import data.Station;
-import data.AirQualityIndex;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -30,19 +30,19 @@ class Cache implements Serializable {
         return updateDate;
     }
 
-    Map<String, Station> getAllStations() {
-        return allStations;
-    }
-
-    Map<Integer, List<Sensor>> getAllSensors() {
-        return allSensors;
-    }
-
     Map<Integer, MeasurementData> getAllData() {
         return allData;
     }
 
     Map<Integer, AirQualityIndex> getAllIndices() {
         return allIndices;
+    }
+
+    Map<Integer, List<Sensor>> getAllSensors() {
+        return allSensors;
+    }
+
+    Map<String, Station> getAllStations() {
+        return allStations;
     }
 }

@@ -68,7 +68,6 @@ public enum AirRadarOption {
         if (sinceDate != null) System.out.println("1st date (since/in): " + DataAnalyzer.fromDateTime(sinceDate));
         if (untilDate != null) System.out.println("2nd date (until): " + DataAnalyzer.fromDateTime(untilDate));
         System.out.println();
-
     }
 
     public static AirRadarOption getValidOption(List<AirRadarOption> availableOptions, Scanner in) {
