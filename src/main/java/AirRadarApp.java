@@ -210,6 +210,6 @@ public class AirRadarApp {
     }
 
     /*
-    TODO: dokumentacja, JAR
+    TODO: dokumentacja
      */
 }

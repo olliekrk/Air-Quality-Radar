@@ -1,9 +1,9 @@
 package radar;
 
+import data.AirQualityIndex;
 import data.MeasurementData;
 import data.Sensor;
 import data.Station;
-import data.AirQualityIndex;
 
 import java.io.IOException;
 
