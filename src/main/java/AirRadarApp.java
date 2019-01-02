@@ -11,8 +11,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Main method class, delivering user interactive interface to run application.
+ */
 public class AirRadarApp {
 
+    /**
+     * Main program's method.
+     *
+     * @param args array of arguments with whom application was run
+     */
     public static void main(String[] args) {
 
         //creating radar instance
@@ -51,6 +59,20 @@ public class AirRadarApp {
         System.out.println("(!) Closing the application.");
     }
 
+    /**
+     * Loop method used to deliver interactiveness.
+     * Runs selected by user air radar option and returns true or closes
+     * the application if user decided to do it, then it returns false.
+     *
+     * @param radar        air quality radar used to perform operations on cache file
+     * @param stationNames names of stations passed as arguments
+     * @param paramCode    code of parameter passed as argument
+     * @param sinceDate    date since passed as argument
+     * @param untilDate    date until passed as argument
+     * @param chosenOption one of air radar options chosen by user
+     * @param in           scanner to read user input
+     * @return true if there is an option to be performed, false if application should be closed
+     */
     private static boolean runOption(AirRadar radar, String[] stationNames, String paramCode, LocalDateTime sinceDate, LocalDateTime untilDate, AirRadarOption chosenOption, Scanner in) {
         boolean loop = true;
 
@@ -108,6 +130,12 @@ public class AirRadarApp {
         return loop;
     }
 
+    /**
+     * Prepares CMD with help of Apache Commons CLI library.
+     *
+     * @param args arguments passed to application
+     * @return prepared command line
+     */
     private static CommandLine prepareCMD(String[] args) {
         final String cmdSyntax = "java -jar \"Air Quality Radar.jar\"";
         Options options = new Options();
@@ -185,6 +213,13 @@ public class AirRadarApp {
         return commandLine;
     }
 
+    /**
+     * Validation method, used to check whether arguments passed to command line
+     * are all correct.
+     *
+     * @param cmd command line to which arguments were passed
+     * @throws MissingArgumentException if at least one of arguments passed to application does not have correct format
+     */
     private static void checkCMD(CommandLine cmd) throws MissingArgumentException {
         if (cmd.hasOption("stations")) {
             if (cmd.getOptionValues("stations").length == 0)
@@ -209,7 +244,4 @@ public class AirRadarApp {
         }
     }
 
-    /*
-    TODO: dokumentacja
-     */
 }

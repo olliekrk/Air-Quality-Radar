@@ -9,10 +9,22 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * Class used for establishing connection with API.
+ * Part of "Factory" design pattern alongside with {@link HttpConnectionFactory}
+ */
 public class HttpConnection implements Closeable {
 
+    /**
+     * Connection established with HTTP server.
+     */
     private final HttpURLConnection connection;
 
+    /**
+     * Constructor which opens connection with given URL address.
+     *
+     * @param url URL address to establish connection with.
+     */
     HttpConnection(String url) {
         try {
             connection = (HttpURLConnection) new URL(url).openConnection();
@@ -21,6 +33,10 @@ public class HttpConnection implements Closeable {
         }
     }
 
+    /**
+     * Method called after every connection is made to make sure that server's response was positive.
+     * Checks whether response code is 200.
+     */
     private void responseCheck() {
         try {
             int responseCode = connection.getResponseCode();
@@ -33,6 +49,12 @@ public class HttpConnection implements Closeable {
         }
     }
 
+    /**
+     * Returns response received from server after establishing connection.
+     * Calls method to check whether connection was successful.
+     *
+     * @return server's response
+     */
     public String getResponseAsString() {
         responseCheck();
         StringBuilder response = new StringBuilder();
