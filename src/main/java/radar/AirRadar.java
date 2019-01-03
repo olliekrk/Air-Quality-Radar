@@ -332,5 +332,8 @@ public abstract class AirRadar {
                 }
             }
         }
+
+        //alternative way of drawing graph
+        printer.printCommonGraph(stations, sensors, dataMap, since, until, paramType, maxValue.getValue());
     }
 }

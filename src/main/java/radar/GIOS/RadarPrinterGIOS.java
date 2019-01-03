@@ -6,7 +6,10 @@ import radar.DataAnalyzer;
 import radar.RadarPrinter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static radar.DataAnalyzer.fromDateTime;
 
@@ -19,7 +22,7 @@ public class RadarPrinterGIOS implements RadarPrinter {
 
     private static final int graphSize = 30;
     private static final String graphChar = "@";
-    private static final String graphFormat = "%s : %s : %s : %s";
+    private static final String graphFormat = "%20s : %-30s : %s : %s \n";
 
     private static final int tableWidth = 50;
     private static final String bigSeparator = String.join("", Collections.nCopies(tableWidth, "=")) + '\n';
@@ -164,17 +167,66 @@ public class RadarPrinterGIOS implements RadarPrinter {
         double oneCharValue = range / graphSize;
         for (LocalDateTime dateTime = since; dateTime.isBefore(until) || dateTime.isEqual(until); dateTime = dateTime.plusHours(1)) {
             String date = DataAnalyzer.fromDateTime(dateTime);
-            MeasurementValue value = null;
-            String graphChars = "";
+            MeasurementValue value;
+            String graphChars;
             try {
                 value = DataAnalyzer.getValue(data, dateTime, null, DataAnalyzer.DateCheckType.IN, DataAnalyzer.ResultType.DEFAULT);
                 int x = (int) Math.floor(value.getValue() / oneCharValue);
                 graphChars = String.join("", Collections.nCopies(x, graphChar));
             } catch (MissingDataException e) {
-                //ignore
+                value = null;
+                graphChars = "";
             }
             result.append(String.format(graphFormat, date, station.getStationName(), graphChars, (value == null) ? "unknown" : value.getValue()));
-            result.append("\n");
+        }
+        System.out.println(result.toString());
+    }
+
+    @Override
+    public void printCommonGraph(List<Station> stations, Map<Integer, Sensor> sensors, Map<Integer, MeasurementData> dataMap, LocalDateTime since, LocalDateTime until, ParamType paramType, Double range) {
+        StringBuilder result = new StringBuilder();
+        result
+                .append(bigSeparator)
+                .append("Common summary graph, for all stations. \n")
+                .append(bigSeparator);
+
+        double oneCharValue = range / graphSize;
+
+        List<Station> completeDataStations = new ArrayList<>();
+        for (Station station : stations) {
+            if (sensors.containsKey(station.getId())) {
+                Sensor sensor = sensors.get(station.getId());
+                if (dataMap.containsKey(sensor.getId())) {
+                    completeDataStations.add(station);
+                }
+            }
+        }
+
+        char letter = 'A';
+        char letterUsed;
+        int uniqueLettersCount = completeDataStations.size();
+        int i = 0;
+
+        for (LocalDateTime dateTime = since; dateTime.isBefore(until) || dateTime.isEqual(until); dateTime = dateTime.plusHours(1)) {
+            String date = DataAnalyzer.fromDateTime(dateTime);
+            MeasurementValue value;
+            String chart;
+            for (Station station : completeDataStations) {
+                try {
+
+                    letterUsed = (char) (letter + i);
+                    i += 1;
+                    i %= uniqueLettersCount;
+
+                    value = DataAnalyzer.getValue(dataMap.get(sensors.get(station.getId()).getId()), dateTime, null, DataAnalyzer.DateCheckType.IN, DataAnalyzer.ResultType.DEFAULT);
+                    int x = (int) Math.floor(value.getValue() / oneCharValue);
+                    chart = String.join("", Collections.nCopies(x, String.valueOf(letterUsed)));
+                } catch (MissingDataException e) {
+                    value = null;
+                    chart = "";
+                }
+                result.append(String.format(graphFormat, date, station.getStationName(), chart, value == null ? "unknown" : value.getValue()));
+            }
         }
         System.out.println(result.toString());
     }

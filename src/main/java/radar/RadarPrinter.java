@@ -3,6 +3,8 @@ package radar;
 import data.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Class used to display results of Air Quality Radar computations by printing them to the console in form of tables.
@@ -94,4 +96,17 @@ public interface RadarPrinter {
      * @param range     the absolute difference between maximum and minimum measured value
      */
     void printGraph(Station station, Sensor sensor, MeasurementData data, LocalDateTime since, LocalDateTime until, ParamType paramType, double range);
+
+    /**
+     * Prints bar chart showing how measurement values were changing every hour on given stations between two dates.
+     *
+     * @param stations  stations on which values were measured
+     * @param sensors   sensors which measured those values
+     * @param dataMap   measurement data map containing all data collected by sensor
+     * @param since     date since
+     * @param until     date until
+     * @param paramType type of parameter
+     * @param range     the absolute difference between maximum and minimum measured value
+     */
+    void printCommonGraph(List<Station> stations, Map<Integer, Sensor> sensors, Map<Integer, MeasurementData> dataMap, LocalDateTime since, LocalDateTime until, ParamType paramType, Double range);
 }
