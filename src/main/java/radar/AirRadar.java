@@ -213,6 +213,45 @@ public abstract class AirRadar {
             sortedValues[i] = sortedTmp[i].value;
         }
         printer.printNSensors(station, sortedSensors, sortedValues, date, paramCode, n);
+
+        //...
+        class Tmp implements Comparable<Tmp> {
+            private Sensor sensor;
+            private MeasurementValue value;
+            private Double levelOver;
+
+            private Tmp(Sensor sensor, MeasurementValue value, Double levelOver) {
+                this.sensor = sensor;
+                this.value = value;
+                this.levelOver = levelOver;
+            }
+
+            @Override
+            public int compareTo(Tmp o) {
+                if (this.levelOver < o.levelOver) return -1;
+                return this.levelOver.equals(o.levelOver) ? 0 : 1;
+            }
+        }
+        List<Sensor> sensorList = seeker.findStationSensors(station.getId());
+        List<Tmp> sensorsOverAcceptableValueList = new ArrayList<>();
+        for (Sensor sensor : sensorList) {
+            ParamType param = ParamType.getParamType(sensor.getParam().getParamCode());
+            MeasurementData measurementData = seeker.findData(sensor.getId());
+            MeasurementValue measurementValue = DataAnalyzer.getValue(measurementData, date, null, DataAnalyzer.DateCheckType.IN, DataAnalyzer.ResultType.DEFAULT);
+            if (measurementValue != null && measurementValue.getValue() != null && measurementValue.getValue() > param.getAcceptableLevel()) {
+                Double levelOver = measurementValue.getValue() / param.getAcceptableLevel();
+                sensorsOverAcceptableValueList.add(new Tmp(sensor, measurementValue, levelOver));
+            }
+        }
+        Tmp[] tmpArray = sensorsOverAcceptableValueList.stream().sorted().toArray(Tmp[]::new);
+        if (tmpArray.length > n) {
+            tmpArray = Arrays.copyOfRange(tmpArray, tmpArray.length - n, tmpArray.length);
+        }
+        Sensor[] sensorsMax = Arrays.stream(tmpArray).map(x -> x.sensor).toArray(Sensor[]::new);
+        MeasurementValue[] valuesMax = Arrays.stream(tmpArray).map(x -> x.value).toArray(MeasurementValue[]::new);
+        Double[] levelsMax = Arrays.stream(tmpArray).map(x -> x.levelOver).toArray(Double[]::new);
+        printer.printOverAcceptableLevel(station, date, sensorsMax, valuesMax, levelsMax);
+        //..
     }
 
     /**

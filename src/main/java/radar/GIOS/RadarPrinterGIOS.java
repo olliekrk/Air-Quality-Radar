@@ -2,6 +2,7 @@ package radar.GIOS;
 
 import data.*;
 import exceptions.MissingDataException;
+import exceptions.UnknownParameterException;
 import radar.DataAnalyzer;
 import radar.RadarPrinter;
 
@@ -177,6 +178,7 @@ public class RadarPrinterGIOS implements RadarPrinter {
                 value = null;
                 graphChars = "";
             }
+            graphChars += graphChar;
             result.append(String.format(graphFormat, date, station.getStationName(), graphChars, (value == null) ? "unknown" : value.getValue()));
         }
         System.out.println(result.toString());
@@ -212,11 +214,10 @@ public class RadarPrinterGIOS implements RadarPrinter {
             MeasurementValue value;
             String chart;
             for (Station station : completeDataStations) {
+                letterUsed = (char) (letter + i);
+                i += 1;
+                i %= uniqueLettersCount;
                 try {
-
-                    letterUsed = (char) (letter + i);
-                    i += 1;
-                    i %= uniqueLettersCount;
 
                     value = DataAnalyzer.getValue(dataMap.get(sensors.get(station.getId()).getId()), dateTime, null, DataAnalyzer.DateCheckType.IN, DataAnalyzer.ResultType.DEFAULT);
                     int x = (int) Math.floor(value.getValue() / oneCharValue);
@@ -225,7 +226,42 @@ public class RadarPrinterGIOS implements RadarPrinter {
                     value = null;
                     chart = "";
                 }
+                chart += letterUsed;
                 result.append(String.format(graphFormat, date, station.getStationName(), chart, value == null ? "unknown" : value.getValue()));
+            }
+        }
+        System.out.println(result.toString());
+    }
+
+    @Override
+    public void printOverAcceptableLevel(Station station, LocalDateTime date, Sensor[] sensorsMax, MeasurementValue[] valuesMax, Double[] levelsMax) {
+        StringBuilder result = new StringBuilder();
+        result
+                .append(bigSeparator)
+                .append(sensorsMax.length)
+                .append(" sensors on which acceptable parameter's measurement values were exceeded. \n")
+                .append(bigSeparator)
+                .append(String.format(stationFormat, station.getStationName(), station.getId()))
+                .append(String.format(oneDateFormat, fromDateTime(date)))
+                .append(separator);
+
+        for (int i = 0; i < sensorsMax.length; i++) {
+            try {
+                result
+                        .append("Top ")
+                        .append(sensorsMax.length - i)
+                        .append(": \n")
+                        .append(String.format(sensorFormat, sensorsMax[i].getParam().getParamName(), sensorsMax[i].getId()))
+                        .append(String.format(defaultMeasurementInfoFormat, valuesMax[i].getDate(), valuesMax[i].getValue()))
+                        .append("Acceptable value for parameter: ")
+                        .append(ParamType.getParamType(sensorsMax[i].getParam().getParamCode()).getAcceptableLevel())
+                        .append(" [ug / m^3] \n")
+                        .append("Acceptable value was exceeded by: ")
+                        .append(levelsMax[i] * 100)
+                        .append("% \n")
+                        .append(separator);
+            } catch (UnknownParameterException e) {
+                //unreachable
             }
         }
         System.out.println(result.toString());

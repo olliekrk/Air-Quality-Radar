@@ -109,4 +109,16 @@ public interface RadarPrinter {
      * @param range     the absolute difference between maximum and minimum measured value
      */
     void printCommonGraph(List<Station> stations, Map<Integer, Sensor> sensors, Map<Integer, MeasurementData> dataMap, LocalDateTime since, LocalDateTime until, ParamType paramType, Double range);
+
+    /**
+     * Prints information about station's sensors which reached measurement values over acceptable parameter's level in given date.
+     *
+     * @param station    station on which sensors were checked
+     * @param date       date when acceptable measurement values were reached
+     * @param sensorsMax array of sensors sorted ascending
+     * @param valuesMax  array of measurement values of those sensors
+     * @param levelsMax  array telling how much in % were those levels exceeded
+     * @see ParamType
+     */
+    void printOverAcceptableLevel(Station station, LocalDateTime date, Sensor[] sensorsMax, MeasurementValue[] valuesMax, Double[] levelsMax);
 }
