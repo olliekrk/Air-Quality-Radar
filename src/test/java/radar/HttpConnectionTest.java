@@ -13,19 +13,19 @@ public class HttpConnectionTest {
     private final String validUrl = "http://api.gios.gov.pl/pjp-api/rest/data/getData/92";
 
     @Test(expected = HttpConnectionException.class)
-    public void connectionFailsTest() {
+    public void connectionFailsTest() throws HttpConnectionException {
         HttpConnection connection = new HttpConnection(invalidUrl);
         System.out.println(connection.getResponseAsString());
     }
 
     @Test(expected = HttpConnectionException.class)
-    public void connectionFailsTest2() {
+    public void connectionFailsTest2() throws HttpConnectionException {
         HttpConnection connection = new HttpConnection(invalidUrl2);
         System.out.println(connection.getResponseAsString());
     }
 
     @Test
-    public void connectionSuccessesTest() {
+    public void connectionSuccessesTest() throws HttpConnectionException {
         HttpConnection connection = new HttpConnection(validUrl);
         String response = connection.getResponseAsString();
         connection.close();

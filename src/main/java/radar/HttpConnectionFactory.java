@@ -1,5 +1,7 @@
 package radar;
 
+import exceptions.HttpConnectionException;
+
 /**
  * "Factory" design pattern alongside with {@link HttpConnection}.
  * One-method class used to establish HTTP connection with given URL.
@@ -11,7 +13,7 @@ public class HttpConnectionFactory {
      * @param url address to connect with
      * @return {@link HttpConnection} connection with given URL
      */
-    public HttpConnection build(String url) {
+    public HttpConnection build(String url) throws HttpConnectionException {
         return new HttpConnection(url);
     }
 }

@@ -1,5 +1,6 @@
 package radar.GIOS;
 
+import exceptions.HttpConnectionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -96,7 +97,7 @@ public class HttpExtractorGIOSTest {
     private HttpExtractorGIOS extractor = new HttpExtractorGIOS();
 
     @Before
-    public void setUp() {
+    public void setUp() throws HttpConnectionException {
         factoryMock = mock(HttpConnectionFactory.class);
         connectionMock = mock(HttpConnection.class);
         extractor.setHttpConnectionFactory(factoryMock);
@@ -104,7 +105,7 @@ public class HttpExtractorGIOSTest {
     }
 
     @Test
-    public void extractIndexData() {
+    public void extractIndexData() throws HttpConnectionException {
         when(connectionMock.getResponseAsString()).thenReturn(INDEX_DATA_EXAMPLE);
 
         assertEquals(extractor.extractIndexData(1), INDEX_DATA_EXAMPLE);
@@ -114,7 +115,7 @@ public class HttpExtractorGIOSTest {
     }
 
     @Test
-    public void extractAllStationsData() {
+    public void extractAllStationsData() throws HttpConnectionException {
         when(connectionMock.getResponseAsString()).thenReturn(STATIONS_DATA_EXAMPLE);
 
         assertEquals(extractor.extractAllStationsData(), STATIONS_DATA_EXAMPLE);
@@ -124,7 +125,7 @@ public class HttpExtractorGIOSTest {
     }
 
     @Test
-    public void extractAllSensorsData() {
+    public void extractAllSensorsData() throws HttpConnectionException {
         when(connectionMock.getResponseAsString()).thenReturn(SENSORS_DATA_EXAMPLE);
 
         assertEquals(extractor.extractAllSensorsData(1), SENSORS_DATA_EXAMPLE);
@@ -134,7 +135,7 @@ public class HttpExtractorGIOSTest {
     }
 
     @Test
-    public void extractMeasurementData() {
+    public void extractMeasurementData() throws HttpConnectionException {
         when(connectionMock.getResponseAsString()).thenReturn(MEASUREMENT_DATA_EXAMPLE);
 
         assertEquals(extractor.extractMeasurementData(1), MEASUREMENT_DATA_EXAMPLE);
@@ -144,7 +145,7 @@ public class HttpExtractorGIOSTest {
     }
 
     @Test
-    public void connectAndExtract() {
+    public void connectAndExtract() throws HttpConnectionException {
         String response = "some response";
         String url = "some url";
         when(connectionMock.getResponseAsString()).thenReturn(response);

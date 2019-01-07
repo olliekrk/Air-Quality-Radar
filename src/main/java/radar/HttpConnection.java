@@ -25,7 +25,7 @@ public class HttpConnection implements Closeable {
      *
      * @param url URL address to establish connection with.
      */
-    HttpConnection(String url) {
+    HttpConnection(String url) throws HttpConnectionException {
         try {
             connection = (HttpURLConnection) new URL(url).openConnection();
         } catch (IOException e) {
@@ -37,7 +37,7 @@ public class HttpConnection implements Closeable {
      * Method called after every connection is made to make sure that server's response was positive.
      * Checks whether response code is 200.
      */
-    private void responseCheck() {
+    private void responseCheck() throws HttpConnectionException {
         try {
             int responseCode = connection.getResponseCode();
             if (responseCode != 200) {
@@ -55,7 +55,7 @@ public class HttpConnection implements Closeable {
      *
      * @return server's response
      */
-    public String getResponseAsString() {
+    public String getResponseAsString() throws HttpConnectionException {
         responseCheck();
         StringBuilder response = new StringBuilder();
         try (BufferedReader responseReader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {

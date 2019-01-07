@@ -257,7 +257,7 @@ public class RadarPrinterGIOS implements RadarPrinter {
                         .append(ParamType.getParamType(sensorsMax[i].getParam().getParamCode()).getAcceptableLevel())
                         .append(" [ug / m^3] \n")
                         .append("Acceptable value was exceeded by: ")
-                        .append(levelsMax[i] * 100)
+                        .append(levelsMax[i] * 100 - 100)
                         .append("% \n")
                         .append(separator);
             } catch (UnknownParameterException e) {

@@ -6,6 +6,7 @@ import data.AirQualityIndex;
 import data.MeasurementData;
 import data.Sensor;
 import data.Station;
+import exceptions.HttpConnectionException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -70,14 +71,20 @@ public class CacheLoader {
         } catch (FileNotFoundException e) {
             System.out.println("(!) File not found under given path: " + cachePath);
             System.out.println("(!) A cache file will be created now, this may take few minutes.");
-            refreshCache(extractor, translator);
-            saveCache();
-            System.out.println("(!) Cache file created successfully.");
+            try {
+                refreshCache(extractor, translator);
+                System.out.println("(!) Cache file created successfully.");
+            } catch (HttpConnectionException e1) {
+                System.out.println("(!) Cache update was impossible due to error with HTTP connection with: " + e1.getMessage());
+                System.out.println("(!) Locally stored version of cache will be used.");
+            } finally {
+                saveCache();
+            }
             return;
         } catch (IOException e) {
-            System.out.println("(!) Failed to load cache from file!");
+            System.out.println("(!) Failed to load cache from file: " + cachePath);
             System.out.println(e.getMessage());
-            return;
+            System.exit(1);
         }
         System.out.println("(!) Last update date: " + DataAnalyzer.fromDateTime(cache.getUpdateDate()));
         if (needsUpdate()) {
@@ -85,9 +92,15 @@ public class CacheLoader {
             System.out.println("(!) An update is required.");
             if (UPDATES_ALLOWED) {
                 System.out.println("(!) Update has started, this may take few minutes.");
-                refreshCache(extractor, translator);
-                saveCache();
-                System.out.println("(!) Cache update finished successfully.");
+                try {
+                    refreshCache(extractor, translator);
+                    System.out.println("(!) Cache update finished successfully.");
+                } catch (HttpConnectionException e1) {
+                    System.out.println("(!) Cache update was impossible due to error with HTTP connection with: " + e1.getMessage());
+                    System.out.println("(!) Locally stored version of cache will be used.");
+                } finally {
+                    saveCache();
+                }
             }
         } else {
             System.out.println("(!) Cache is up-to-date.");
@@ -123,26 +136,26 @@ public class CacheLoader {
      * @param extractor  {@link HttpExtractor} used to extract data to be saved
      * @param translator {@link RadarReader} used to translate JSON data into POJO
      */
-    private void refreshCache(HttpExtractor extractor, RadarReader translator) {
-        Station[] stations = translator.readStationsData(extractor.extractAllStationsData());
-
+    private void refreshCache(HttpExtractor extractor, RadarReader translator) throws HttpConnectionException {
         //all stations data (key is station name)
         Map<String, Station> allStations = new HashMap<>();
+        //all sensors data (key is station id)
+        Map<Integer, List<Sensor>> allSensors = new HashMap<>();
+        //all air quality index data (key is station id)
+        Map<Integer, AirQualityIndex> allIndices = new HashMap<>();
+        //all measurement data (key is sensor id)
+        Map<Integer, MeasurementData> allData = new HashMap<>();
+
+        Station[] stations = translator.readStationsData(extractor.extractAllStationsData());
 
         for (Station s : stations) {
             allStations.put(s.getStationName(), s);
         }
 
-        //all sensors data (key is station id)
-        Map<Integer, List<Sensor>> allSensors = new HashMap<>();
-
         for (Station s : stations) {
             List<Sensor> stationSensors = Arrays.asList(translator.readSensorsData(extractor.extractAllSensorsData(s.getId())));
             allSensors.put(s.getId(), stationSensors);
         }
-
-        //all air quality index data (key is station id)
-        Map<Integer, AirQualityIndex> allIndices = new HashMap<>();
 
         for (Station s : stations) {
             AirQualityIndex index;
@@ -154,16 +167,12 @@ public class CacheLoader {
             allIndices.put(s.getId(), index);
         }
 
-        //all measurement data (key is sensor id)
-        Map<Integer, MeasurementData> allData = new HashMap<>();
-
         for (List<Sensor> sensorList : allSensors.values()) {
             for (Sensor sensor : sensorList) {
                 MeasurementData data = translator.readMeasurementData(extractor.extractMeasurementData(sensor.getId()));
                 allData.put(sensor.getId(), data);
             }
         }
-
 
         //save current date
         this.cache = new Cache(LocalDateTime.now(), allStations, allSensors, allData, allIndices);
