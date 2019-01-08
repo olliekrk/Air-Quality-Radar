@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public abstract class AirRadar {
 
-    //all 4 are parts of separate "Strategy" design patterns
+    //all 3 are parts of separate "Strategy" design patterns
     /**
      * used to extract data from HTTP service
      */

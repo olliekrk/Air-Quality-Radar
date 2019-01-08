@@ -30,7 +30,7 @@ public class CacheLoader {
     /**
      * Flag telling whether updates of cache are allowed.
      */
-    private static final boolean UPDATES_ALLOWED = true;
+    private static boolean UPDATES_ALLOWED = true;
     /**
      * Path to a cache file.
      */
@@ -64,7 +64,8 @@ public class CacheLoader {
      * @param extractor  {@link HttpExtractor} used to extract data to be saved
      * @param translator {@link RadarReader} used to translate JSON data into POJO
      */
-    public void loadCache(HttpExtractor extractor, RadarReader translator) {
+    public void loadCache(HttpExtractor extractor, RadarReader translator, boolean updatesAllowed) {
+        setUpdatesAllowed(updatesAllowed);
         try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(cachePath), StandardCharsets.UTF_8))) {
             Gson gson = new GsonBuilder().create();
             this.cache = gson.fromJson(reader, Cache.class);
@@ -101,6 +102,8 @@ public class CacheLoader {
                 } finally {
                     saveCache();
                 }
+            } else {
+                System.out.println("(!) Updates are not allowed.");
             }
         } else {
             System.out.println("(!) Cache is up-to-date.");
@@ -114,6 +117,15 @@ public class CacheLoader {
 
     void setCache(Cache cache) {
         this.cache = cache;
+    }
+
+    /**
+     * Setter for parameter {@value UPDATES_ALLOWED}. Specifies whether cache updates can be performed.
+     *
+     * @param updatesAllowed flag telling whether cache updates can be performed, true when they are
+     */
+    private void setUpdatesAllowed(boolean updatesAllowed) {
+        UPDATES_ALLOWED = updatesAllowed;
     }
 
     /**

@@ -173,12 +173,11 @@ public class RadarPrinterGIOS implements RadarPrinter {
             try {
                 value = DataAnalyzer.getValue(data, dateTime, null, DataAnalyzer.DateCheckType.IN, DataAnalyzer.ResultType.DEFAULT);
                 int x = (int) Math.floor(value.getValue() / oneCharValue);
-                graphChars = String.join("", Collections.nCopies(x, graphChar));
+                graphChars = String.join("", Collections.nCopies(x + 1, graphChar));
             } catch (MissingDataException e) {
                 value = null;
                 graphChars = "";
             }
-            graphChars += graphChar;
             result.append(String.format(graphFormat, date, station.getStationName(), graphChars, (value == null) ? "unknown" : value.getValue()));
         }
         System.out.println(result.toString());
@@ -221,12 +220,11 @@ public class RadarPrinterGIOS implements RadarPrinter {
 
                     value = DataAnalyzer.getValue(dataMap.get(sensors.get(station.getId()).getId()), dateTime, null, DataAnalyzer.DateCheckType.IN, DataAnalyzer.ResultType.DEFAULT);
                     int x = (int) Math.floor(value.getValue() / oneCharValue);
-                    chart = String.join("", Collections.nCopies(x, String.valueOf(letterUsed)));
+                    chart = String.join("", Collections.nCopies(x + 1, String.valueOf(letterUsed)));
                 } catch (MissingDataException e) {
                     value = null;
                     chart = "";
                 }
-                chart += letterUsed;
                 result.append(String.format(graphFormat, date, station.getStationName(), chart, value == null ? "unknown" : value.getValue()));
             }
         }
